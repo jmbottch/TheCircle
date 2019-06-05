@@ -3,6 +3,14 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const config = require('../../config/auth_config');
 
+function verifyMessage(message, hash) {
+    bcrypt.hash(message, (err, genhash) => {
+        if (hash == genhash) {
+            console.log("integrity");
+        }
+    });
+}
+
 function login(req, res) {
     User.findOne({ name: req.body.name })
         .then(user => {
