@@ -30,7 +30,7 @@ userroutes(app);
 
 mongodb.createDevConnection();
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT || 5000, () => {
     console.log('App is ready for requests.')
   })
   .on('error', (error) => {
