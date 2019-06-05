@@ -19,6 +19,13 @@ describe('the auth_controller can', () => {
         password:'Password'
     })
 
+    noname = new User({
+        password: 'Password'
+    })
+    nopass = new User({
+        name:'Test User'
+    })
+
     it('can log in a user', (done) => {
         request(app)
         .post('/api/user/register')
@@ -35,6 +42,42 @@ describe('the auth_controller can', () => {
                 expect(res.body.token).to.equal(token)
                 done()
             })
+        })
+    })
+
+    it('throws an error when no name is provided', (done) => {
+        request(app)
+        .post('/api/user/register')
+        .send(user)
+        .end(function(err,res) {
+            expect(res.statusCode).to.equal(200)
+            request(app)
+            .post('/api/user/login')
+            .send(noname)
+            .end(function(err,res) {
+                expect(res.statusCode).to.equal(401)
+                expect(res.body.Error).to.equal('No name provided')
+                done()
+            })
+            
+        })
+    })
+
+    it('throws an error when no password is provided', (done) => {
+        request(app)
+        .post('/api/user/register')
+        .send(user)
+        .end(function(err,res) {
+            expect(res.statusCode).to.equal(200)
+            request(app)
+            .post('/api/user/login')
+            .send(nopass)
+            .end(function(err,res) {
+                expect(res.statusCode).to.equal(401)
+                expect(res.body.Error).to.equal('No Password provided')
+                done()
+            })
+            
         })
     })
 })

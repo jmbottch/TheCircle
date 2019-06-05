@@ -4,7 +4,13 @@ const bcrypt = require('bcryptjs');
 const config = require('../../config/auth_config');
 
 function login(req, res) {
-    User.findOne({ name: req.body.name })
+    if(!req.body.name) {
+        res.status(401).send({Error:'No name provided'})
+    } else
+    if(!req.body.password) {
+        res.status(401).send({Error:'No Password provided'})
+    } else {
+        User.findOne({ name: req.body.name })
         .then(user => {
             var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) {
@@ -20,7 +26,8 @@ function login(req, res) {
         .catch(error => {
             res.status(401).send({ Error: error });
         });
-}
+    }
+    }
 
 function validateToken(req, res, next) {
     if (!req.headers.authorization) {

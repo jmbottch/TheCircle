@@ -14,43 +14,49 @@ function getAll(req, res) {
 }
 
 function create(req, res) {
-    var hashedPassword = bcrypt.hashSync(req.body.password, 8);
-    User.create({
-        name: req.body.name,
-        nickname: req.body.name,
-        password: hashedPassword
-    })
-        .then(madeUser => {
-            var token = jwt.sign({ id: madeUser._id }, config.secret, {
-                expiresIn: 86400 // expires in 24 hours
-            });
-            res.status(200).send({ Message: "User created succesfully.", auth: true, token: token });
+    if (!req.body.password) {
+        res.status(401).send({ Error: 'No password provided' })
+    } else {
+        var hashedPassword = bcrypt.hashSync(req.body.password, 8);
+        User.create({
+            name: req.body.name,
+            nickname: req.body.name,
+            password: hashedPassword
         })
-        .catch((err) => {
-            if (err.name == 'MongoError' && err.code == 11000) {
-                res.status(401).send({ Error: 'Username is taken.' });
-            } else {
-                res.status(401).send({ err });
-            }
-        });
+            .then(madeUser => {
+                var token = jwt.sign({ id: madeUser._id }, config.secret, {
+                    expiresIn: 86400 // expires in 24 hours
+                });
+                res.status(200).send({ Message: "User created succesfully.", auth: true, token: token });
+            })
+            .catch((err) => {
+                if (err.name == 'MongoError' && err.code == 11000) {
+                    res.status(401).send({ Error: 'Username is taken.' });
+                }
+                else {
+                    res.status(401).send({ err });
+                }
+            });
+    }
+
 };
 
-function editPassword(req, res) { 
+function editPassword(req, res) {
     var hashedPassword = bcrypt.hashSync(req.body.newPassword, 8);
     User.findById(req.params.id)
         .then((user) => {
             if (user === null) {
                 res.status(401).send({ Error: 'User does not exist.' })
             }
-                else {
-                    user.set({ password: hashedPassword })
-                    user.save()
-                        .then(() => res.status(200).send({ Message: "password changed succesfully" }))
-                        .catch((err) => res.status(401).send(err));
-                }
+            else {
+                user.set({ password: hashedPassword })
+                user.save()
+                    .then(() => res.status(200).send({ Message: "password changed succesfully" }))
+                    .catch((err) => res.status(401).send(err));
+            }
         })
-        .catch((err) => {            
-                res.status(401).send({ err });
+        .catch((err) => {
+            res.status(401).send({ err });
         });
 };
 
@@ -60,11 +66,11 @@ function remove(req, res) {
             if (user === null) {
                 res.status(401).send({ Error: 'To be deleted does not exist.' })
             }
-                else {
-                    user.delete()
-                        .then(() => res.status(200).send({ Message: 'User succesfully removed.' }))
-                        .catch((err) => res.status(401).send(err))
-                }
+            else {
+                user.delete()
+                    .then(() => res.status(200).send({ Message: 'User succesfully removed.' }))
+                    .catch((err) => res.status(401).send(err))
+            }
         });
 };
 
