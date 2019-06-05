@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 
-var salt = 10;
 var privateKey = 'seeChange';
 
 function verifyMessage(req, res) {
@@ -23,6 +22,7 @@ function verifyMessage(req, res) {
     }
 }
 
+// Implement in frontend
 function createHash(req, res) {
     var message = req.body.message;
     var hmac = crypto.createHmac('sha256', privateKey).update(message).digest('hex');
