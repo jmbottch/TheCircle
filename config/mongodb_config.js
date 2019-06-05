@@ -6,12 +6,13 @@ var env = {
     dbDatabase: process.env.DB_DATABASE || 'authtestdb'
 }
 
-var dburl = process.env.NODE_ENV === 'production' ?
-    'mongodb://' + env.dbUser + ':' + env.dbPassword + '@' + env.dbHost + ':' + env.dbPort + '/' + env.dbDatabase :
-    'mongodb://localhost/' + env.dbDatabase
+// var dburl = process.env.NODE_ENV === 'production' ?
+//     'mongodb://' + env.dbUser + ':' + env.dbPassword + '@' + env.dbHost + ':' + env.dbPort + '/' + env.dbDatabase :
+//     'mongodb://localhost/' + env.dbDatabase;
 
-// mongodb://localhost/' + env.dbDatabase
-var dburl_dev = 'mongodb://seeuser:seepass1@ds231537.mlab.com:31537/seechange';
+var baseurl = 'mongodb://seeuser:seepass1@ds231537.mlab.com:31537';
+var dburl = baseurl + '/seechange';
+var dburl_dev = 'mongodb://localhost/' + env.dbDatabase;
 
 module.exports = {
     env,

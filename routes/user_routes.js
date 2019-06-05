@@ -1,5 +1,6 @@
 const UserController = require('../src/controllers/user_controller');
 const AuthController = require('../src/controllers/auth_controller');
+const MessageController = require('../src/controllers/message_controller');
 
 module.exports = (app) => {
     //
@@ -21,4 +22,7 @@ module.exports = (app) => {
     app.put('/api/user/:id', AuthController.validateToken, UserController.editNickname);
     //remove a user from the database with 'name, password'
     app.delete('/api/user/:id', AuthController.validateToken, AuthController.validateAdmin, UserController.remove);
+
+    app.post('/api/createHash', AuthController.validateToken, MessageController.createHash);
+    app.post('/api/verifyHash', AuthController.validateToken, MessageController.verifyMessage);
 };
