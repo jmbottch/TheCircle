@@ -1,0 +1,23 @@
+{
+  "name": "basicauthserver",
+  "version": "1.0.0",
+  "description": "Stub for a Mongo/Express server with auth",
+  "main": "server.js",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.5.10",
+    "nodemon": "^1.19.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "nodemon server.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "DoC98",
+  "license": "ISC"
+}
