@@ -11,7 +11,6 @@ const UserSchema = new Schema({
         },
         required: [true, 'Name is required.']
     },
-    nickname: String,
     password: {
         type: String,
         validate: {

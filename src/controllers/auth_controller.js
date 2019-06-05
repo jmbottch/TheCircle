@@ -31,7 +31,6 @@ function validateToken(req, res, next) {
         return res.status(401).send({ Error: 'No token provided.' })
     }
     jwt.verify(token, config.secret, function (err, decoded) {
-        console.log(decoded)
         if (err) return res.status(401).send({ Error: 'Token is invalid.' })
         if (decoded) next();
     });
@@ -40,7 +39,6 @@ function validateToken(req, res, next) {
 function isAdmin(req, res, next) {
     User.findById({ _id: req.params.id })
         .then(founduser => {
-            console.log(founduser);
             if (founduser.admin) {
                 return res.status(200).send("Gebruiker is een administrator.")
             } else {
@@ -55,7 +53,6 @@ function isAdmin(req, res, next) {
 function validateAdmin(req, res, next) {
     User.findOne({ name: req.headers.name })
         .then(foundUser => {
-            //console.log("admin = " + JSON.parse(foundUser.admin));
             if (foundUser.admin) next();
             else return res.status(401).send({ Error: 'Gebruiker is geen administrator.' });
         })

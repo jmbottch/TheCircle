@@ -21,7 +21,6 @@ function create(req, res) {
         password: hashedPassword
     })
         .then(madeUser => {
-            console.log('>>user saved')
             var token = jwt.sign({ id: madeUser._id }, config.secret, {
                 expiresIn: 86400 // expires in 24 hours
             });
@@ -36,42 +35,22 @@ function create(req, res) {
         });
 };
 
-function editPassword(req, res) {
+function editPassword(req, res) { 
     var hashedPassword = bcrypt.hashSync(req.body.newPassword, 8);
-    User.findOne({ name: req.params.name })
-        .then(user => {
+    User.findById(req.params.id)
+        .then((user) => {
             if (user === null) {
                 res.status(401).send({ Error: 'User does not exist.' })
             }
-            if (user.admin === false) {
-                var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-                if (!passwordIsValid) {
-                    res.status(401).send({ Error: 'Current password does not match.' })
-                }
                 else {
                     user.set({ password: hashedPassword })
                     user.save()
                         .then(() => res.status(200).send({ Message: "password changed succesfully" }))
                         .catch((err) => res.status(401).send(err));
                 }
-            } else {
-                res.status(401).send("User is not an administrator.");
-            }
-        });
-};
-
-function editNickname(req, res) {
-    User.findById(req.params.id)
-        .then(user => {
-            if (user === null) {
-                res.status(401).send({ Error: 'User does not exist.' })
-            }
-            else {
-                user.set({ nickname: req.body.newName })
-                user.save()
-                    .then(() => res.status(200).send({ Message: "Nickname changed succesfully" }))
-                    .catch((err) => res.status(401).send(err));
-            }
+        })
+        .catch((err) => {            
+                res.status(401).send({ err });
         });
 };
 
@@ -81,18 +60,11 @@ function remove(req, res) {
             if (user === null) {
                 res.status(401).send({ Error: 'To be deleted does not exist.' })
             }
-            if (user.admin === false) {
-                var passwordIsValid = bcrypt.compareSync(req.headers.password, user.password);
-                if (!passwordIsValid) {
-                    res.status(401).send({ Error: 'Current password does not match.' })
-                }
                 else {
                     user.delete()
-                        .then(() => res.status(200).send({ Message: 'User succesfully removed.' }));
+                        .then(() => res.status(200).send({ Message: 'User succesfully removed.' }))
+                        .catch((err) => res.status(401).send(err))
                 }
-            } else {
-                res.status(401).send("User is not an administrator.");
-            }
         });
 };
 
@@ -100,6 +72,5 @@ module.exports = {
     getAll,
     create,
     editPassword,
-    editNickname,
     remove
 }
