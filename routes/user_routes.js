@@ -15,19 +15,10 @@ module.exports = (app) => {
     //User routes
     //
     //get all users
-    app.get('/api/users/', AuthController.validateToken, UserController.getAll);
+    app.get('/api/users/', UserController.getAll);
     //change password of an existing user with 'name, password, newPassword'
-    app.put('/api/user/:id', AuthController.validateToken, AuthController.validateAdmin, UserController.editPassword);
-    //change nickname of an existing user with 'name, password, newName'
-    app.put('/api/user/:id', AuthController.validateToken, UserController.editNickname);
+    app.put('/api/user/:id', AuthController.validateToken, UserController.editPassword);
     //remove a user from the database with 'name, password'
-    app.delete('/api/user/:id', AuthController.validateToken, AuthController.validateAdmin, UserController.remove);
 
-    // Message integrity check
-    app.post('/api/createHash', AuthController.validateToken, VerificationController.createHash);
-    app.post('/api/verifyHash', AuthController.validateToken, VerificationController.verifyMessage);
-    // app.get('/api/createPrivkey', AuthController.validateToken, VerificationController.createPrivateKey);
-    app.get('/api/path', VerificationController.checkPath);
-    app.post('/api/sign', VerificationController.signHash);
-    app.post('/api/decrypt', VerificationController.decryptHash);
+    app.delete('/api/user/:id', AuthController.validateToken, UserController.remove);
 };
