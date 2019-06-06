@@ -2,6 +2,7 @@ var env = {
     dbHost: process.env.DB_HOST || 'localhost',
     dbPort: process.env.DB_PORT || '3000',
     dbUser: process.env.DB_USER || '',
+    port: process.env.PORT || '5000',
     dbPassword: process.env.DB_PASSWORD || '',
     dbDatabase: process.env.DB_DATABASE || 'seeChange'
 }
