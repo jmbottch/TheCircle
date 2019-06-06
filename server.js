@@ -15,12 +15,14 @@ app.use(express.static(__dirname));
 
 const userroutes = require('./routes/user_routes');
 const messageroutes = require('./routes/message_routes');
+const streamroutes = require('./routes/stream_routes');
 
 //enabled routes
 userroutes(app);
 messageroutes(app);
+streamroutes(app);
 
-mongodb.createDevConnection();
+mongodb.createDevConnection();     
 
 var server = http.listen(5000, () => {
   console.log('server is running on port', server.address().port);

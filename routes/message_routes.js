@@ -3,8 +3,8 @@ const AuthController = require('../src/controllers/auth_controller')
 
 module.exports = (app) => {
     //get a list of messages
-    app.get('/api/messages', MessageController.getAll);
+    app.get('/api/message/all', MessageController.getAll);
 
     //post a new message
-    app.post('/api/messages', AuthController.validateToken, MessageController.post);
+    app.post('/api/message', MessageController.post);
 };

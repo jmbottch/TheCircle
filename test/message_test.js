@@ -29,7 +29,7 @@ describe('the message_controller', () => {
 
     it('can fetch a list of messages', (done) => {
         request(app)
-            .get('/api/messages')
+            .get('/api/message/all')
             .end(function (err, res) {
                 expect(res.statusCode).to.equal(200)
                 expect(res.body).to.be.empty
@@ -45,7 +45,7 @@ describe('the message_controller', () => {
                 expect(res.statusCode).to.equal(200)
                 var token = 'Bearer ' + res.body.token
                 request(app)
-                    .post('/api/messages')
+                    .post('/api/message/')
                     .send(msg)
                     .set({ 'Authorization': token })
                     .end(function (err, res) {
@@ -57,7 +57,7 @@ describe('the message_controller', () => {
 
     it('throws an error when not logged in on posting a message', (done) => {
         request(app)
-        .post('/api/messages')
+        .post('/api/message/')
         .send(msg)
         .end(function(err,res) {
             expect(res.body.Error).to.equal('No token provided.')
@@ -74,7 +74,7 @@ describe('the message_controller', () => {
             expect(res.body.auth).to.equal(true)
             var token = 'Bearer ' + res.body.token
             request(app)
-            .post('/api/messages')
+            .post('/api/message')
             .send(noname)
             .set({'Authorization' : token})
             .end(function(err,res) {
@@ -94,7 +94,7 @@ describe('the message_controller', () => {
             expect(res.body.auth).to.equal(true)
             var token = 'Bearer ' + res.body.token
             request(app)
-            .post('/api/messages')
+            .post('/api/message')
             .send(nocontent)
             .set({'Authorization' : token})
             .end(function(err,res) {
