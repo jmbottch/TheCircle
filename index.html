@@ -11,6 +11,12 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
         crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        $(window).on('beforeunload', function () {
+            socket.close();
+        });
+    </script>
 </head>
 
 <body>
@@ -28,19 +34,11 @@
         <div id="messages"></div>
     </div>
     <script>
-        var socket = io();
-
-        $(window).on('beforeunload', function () {
-            socket.close();
-        });
-
-        $(() => {
-            $("#send").click(() => {
-                sendMessage({ author: $("#author").val(), message: $("#message").val() });
-            })
-
+        $("#send").click(() => {
+            sendMessage({ author: $("#author").val(), message: $("#message").val() });
             getMessages()
         })
+
 
         socket.on('message', addMessages)
 
