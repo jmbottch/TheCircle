@@ -3,7 +3,7 @@ const StreamMdl = require('../models/stream')
 
 
 function getAll(req, res) {
-  Message.find({}, {_v: 0})
+  Message.find({}, { __v: 0})
     .then(messages => {
       res.status(200).send(messages);
     })
@@ -13,10 +13,10 @@ function getAll(req, res) {
 }
 
 function getStreamMessages(req,res) {
-  StreamMdl.findById(req.params.id)
-  .sort('-createdAt')
+  StreamMdl.findById(req.params.id, { __v: 0})
+  .populate('messages')
   .then(stream => {
-    res.send(200).send(stream.messages)
+    res.status(200).send(stream.messages)
   })
   .catch(err => {
     res.status(401).send(err)
@@ -26,7 +26,7 @@ function getStreamMessages(req,res) {
 function create(req, res) {
   Message.create(req.body)
   .then((msg) => {
-    StreamMdl.findById(req.body.author)
+    StreamMdl.findById(req.body.stream)
     .then(stream => {
       stream.messages.push(msg)
       stream.save()

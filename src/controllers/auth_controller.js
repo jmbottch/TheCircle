@@ -43,34 +43,7 @@ function validateToken(req, res, next) {
     });
 }
 
-function isAdmin(req, res, next) {
-    User.findById({ _id: req.params.id })
-        .then(founduser => {
-            if (founduser.admin) {
-                return res.status(200).send("Gebruiker is een administrator.")
-            } else {
-                return res.status(401).send({ Error: 'Gebruiker is geen administrator.' })
-            }
-        })
-        .catch(() => {
-            return res.status(401).send({ Error: 'Gebruiker niet gevonden.' })
-        });
-}
-
-function validateAdmin(req, res, next) {
-    User.findOne({ name: req.headers.name })
-        .then(foundUser => {
-            if (foundUser.admin) next();
-            else return res.status(401).send({ Error: 'Gebruiker is geen administrator.' });
-        })
-        .catch(() => {
-            return res.status(401).send({ Error: 'Gebruiker niet gevonden.' })
-        });
-}
-
 module.exports = {
     login,
-    validateToken,
-    isAdmin,
-    validateAdmin
+    validateToken
 }

@@ -20,7 +20,6 @@ function create(req, res) {
         var hashedPassword = bcrypt.hashSync(req.body.password, 8);
         User.create({
             name: req.body.name,
-            nickname: req.body.name,
             password: hashedPassword
         })
             .then(madeUser => {

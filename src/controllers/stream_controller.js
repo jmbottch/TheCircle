@@ -3,8 +3,8 @@ const StreamMdl = require('../models/stream');
 //Get function, returns all available streams
 //messages and version are omitted from the results
 function getAll(req, res) {
-    StreamMdl.find({}, { __v: 0 })
-        .populate('host', '-password -admin -__v')
+    StreamMdl.find({}, { messages: 0, __v: 0 })
+        .populate('host')
         .then(streams => {
             res.status(200).send(streams);
         })
