@@ -5,7 +5,7 @@ module.exports = (app) => {
     //get a list of messages
     app.get('/api/message/all', MessageController.getAll);
 
-    app.get('/api/stream/:id/messages', MessageController.getStreamMessages)
+    app.get('/api/messages/host/:id/', MessageController.getStreamMessages)
 
     //post a new message
     app.post('/api/message', MessageController.create);

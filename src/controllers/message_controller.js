@@ -1,7 +1,7 @@
 const Message = require('../models/message')
-const StreamMdl = require('../models/stream')
+const User = require('../models/user')
 
-
+//depricated
 function getAll(req, res) {
   Message.find({}, { __v: 0})
     .then(messages => {
@@ -13,10 +13,10 @@ function getAll(req, res) {
 }
 
 function getStreamMessages(req,res) {
-  StreamMdl.findById(req.params.id, { __v: 0})
+  User.findById(req.params.id, { __v: 0})
   .populate('messages')
-  .then(stream => {
-    res.status(200).send(stream.messages)
+  .then(foundUser => {
+    res.status(200).send(foundUser.messages)
   })
   .catch(err => {
     res.status(401).send(err)
@@ -25,25 +25,26 @@ function getStreamMessages(req,res) {
 
 function create(req, res) {
   Message.create(req.body)
-  .then((msg) => {
-    StreamMdl.findById(req.body.stream)
-    .then(stream => {
-      stream.messages.push(msg)
-      stream.save()
+  .then(msg => {
+    User.findById(req.body.host)
+    .then(foundUser => {
+      foundUser.messages.push(msg)
+      foundUser.save()
       .then(() => {
         res.status(200).send({Message : 'Message saved'})
       })
       .catch(() => {
         Message.remove(msg)
-        res.status(401).send({Error:'Error while pushing Message to Stream'})
+        res.status(401).send({Error:'Error while pushing Message to Host'})
       })
     })
     .catch(err => {
       Message.remove(msg)
-      res.status(401).send({Error:'Stream not found'})
+      res.status(401).send({Error:'Host not found'})
     })
     .catch(err => {
-      res.status(401).send({Error: 'Error while creating Message', err: err})
+      console.log(err);
+      res.status(401).send({Error: 'Error while creating Message'})
     })
   })
 };

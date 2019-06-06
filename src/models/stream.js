@@ -14,12 +14,7 @@ const StreamSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'user',
         required: [true, 'Host is required.']
-    },
-    messages: [{
-        type: Schema.Types.ObjectId,
-        ref: 'message',
-        default: ['']
-    }]
+    }
 }, {
     timestamps: true
 });

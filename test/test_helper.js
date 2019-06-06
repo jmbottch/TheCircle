@@ -11,10 +11,12 @@ before((done) => {
 })
 
 beforeEach((done) => {
-    const{users, messages} = mongoose.connection.collections
+    const{users, messages, streams} = mongoose.connection.collections
     users.drop(() => {
         messages.drop(() => {
-            done()
+            streams.drop(() => {
+                done()
+            })
         })
     })
 })

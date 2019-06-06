@@ -18,7 +18,12 @@ const UserSchema = new Schema({
             message: 'Password must be at least three characters.'
         },
         required: [true, 'Password is required.']
-    }
+    },
+    messages: [{
+        type: Schema.Types.ObjectId,
+        ref: 'message',
+        default: ['']
+    }]
 });
 
 const User = mongoose.model('user', UserSchema);
