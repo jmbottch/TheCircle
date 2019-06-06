@@ -9,22 +9,22 @@ const Message = mongoose.model('message')
 
 describe('the message_controller', () => {
     msg = new Message({
-        name: 'Test Message',
+        author: 'Test Message',
         message: 'Content'
     })
 
     user = new User({
-        name: 'Test User',
+        author: 'Test User',
         password: 'Password',
         admin: true
     })
 
-    noname = new User({
+    noauthor = new User({
         message: 'Content'
     })
 
     nocontent = new User ({
-        name:'Test Message'
+        author:'Test Message'
     })
 
     it('can fetch a list of messages', (done) => {
@@ -65,7 +65,7 @@ describe('the message_controller', () => {
         })
     })
 
-    it('throws an error when message-name is not provided', (done) => {
+    it('throws an error when message-author is not provided', (done) => {
         request(app)
         .post('/api/user/register')
         .send(user)
@@ -75,11 +75,11 @@ describe('the message_controller', () => {
             var token = 'Bearer ' + res.body.token
             request(app)
             .post('/api/message')
-            .send(noname)
+            .send(noauthor)
             .set({'Authorization' : token})
             .end(function(err,res) {
                 expect(res.statusCode).to.equal(401)
-                expect(res.body.Error).to.equal('No name provided')
+                expect(res.body.Error).to.equal('No author provided')
                 done()
             })
         })
