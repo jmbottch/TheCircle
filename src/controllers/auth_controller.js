@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const config = require('../../config/auth_config');
 
 function login(req, res) {
+    console.log("HIER!!!");
     if(!req.body.name) {
         res.status(401).send({Error:'No name provided'})
     } else
