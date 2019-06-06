@@ -10,7 +10,7 @@
         crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
         crossorigin="anonymous"></script>
-    <script src="node_modules/socket.io-client/dist/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 
 <body>
@@ -29,6 +29,11 @@
     </div>
     <script>
         var socket = io();
+
+        $(window).on('beforeunload', function () {
+            socket.close();
+        });
+
         $(() => {
             $("#send").click(() => {
                 sendMessage({ author: $("#author").val(), message: $("#message").val() });

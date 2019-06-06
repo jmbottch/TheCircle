@@ -6,5 +6,5 @@ module.exports = (app) => {
     app.get('/api/message/all', MessageController.getAll);
 
     //post a new message
-    app.post('/api/message', MessageController.post);
+    app.post('/api/message', MessageController.create);
 };
