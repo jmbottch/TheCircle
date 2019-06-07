@@ -12,7 +12,7 @@ function getAll(req, res) {
     });
 }
 
-function getStreamMessages(req,res) {
+function getStreamMessages(req, res) {
   User.findById(req.params.id, { __v: 0})
   .populate('messages')
   .then(foundUser => {
@@ -31,10 +31,13 @@ function create(req, res) {
       foundUser.messages.push(msg)
       foundUser.save()
       .then(() => {
+        //emitNewMsg(req.body.host)
+        //socket.emit('getMsgs', req.body.host);
         res.status(200).send({Message : 'Message saved'})
       })
-      .catch(() => {
+      .catch(err => {
         Message.remove(msg)
+        console.log(err);
         res.status(401).send({Error:'Error while pushing Message to Host'})
       })
     })

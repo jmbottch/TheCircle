@@ -8,5 +8,6 @@ module.exports = (app) => {
     app.get('/api/messages/host/:id/', MessageController.getStreamMessages)
 
     //post a new message
-    app.post('/api/message', MessageController.create);
+    //find this route in server.js, bc of socket import errors
+    //app.post('/api/message', MessageController.create);
 };

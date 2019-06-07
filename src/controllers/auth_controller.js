@@ -20,7 +20,7 @@ function login(req, res) {
                 var token = jwt.sign({ id: user._id }, config.secret, {
                     expiresIn: 86400 // expires in 24 hours
                 });
-                res.status(200).send({ auth: true, token: token });
+                res.status(200).send({ auth: true, token: token, userId: madeUser._id });
             }
         })
         .catch(error => {

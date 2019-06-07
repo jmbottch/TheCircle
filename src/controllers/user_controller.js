@@ -26,7 +26,7 @@ function create(req, res) {
                 var token = jwt.sign({ id: madeUser._id }, config.secret, {
                     expiresIn: 86400 // expires in 24 hours
                 });
-                res.status(200).send({ Message: "User created succesfully.", auth: true, token: token , userId: madeUser._id});
+                res.status(200).send({ Message: "User created succesfully.", auth: true, token: token, userId: madeUser._id});
             })
             .catch((err) => {
                 if (err.name == 'MongoError' && err.code == 11000) {
