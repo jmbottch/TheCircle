@@ -52,6 +52,7 @@ app.post('/api/message/', function (req, res) {
       })
       .catch(err => {
         Message.remove(msg)
+        console.log(err);
         res.status(401).send({Error:'Error while pushing Message to Host'})
       })
     })
@@ -60,6 +61,7 @@ app.post('/api/message/', function (req, res) {
       res.status(401).send({Error:'Host not found'})
     })
     .catch(err => {
+      console.log(err);
       res.status(401).send({Error: 'Error while creating Message'})
     })
   })
@@ -67,7 +69,13 @@ app.post('/api/message/', function (req, res) {
 
 io.on('connection', socket => {
   socket.on('getMsgs', userId => {
-   emitNewMsg(userId);
+    User.findById(userId, { __v: 0})
+  .populate('messages')
+  .then(foundUser => {
+    messages = foundUser.messages
+    console.log(this.messages)
+    socket.emit('getMsgs', messages);
+  });
   });
 
 //   socket.on('addMsg', msg => {
@@ -79,7 +87,7 @@ io.on('connection', socket => {
   console.log(`Socket ${socket.id} has connected`);
 });
 
-http.listen(process.env.PORT || 5000, () => {
+http.listen(process.env.PORT | 5000, () => {
   console.log('server is running on port 5000');
 });
 
