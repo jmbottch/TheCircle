@@ -24,12 +24,11 @@ const UserSchema = new Schema({
         ref: 'message',
         default: ['']
     }],
-    kudos : [
+    kudos :
         {
             type: Number,
             default: 0
         }
-    ],
 });
 
 const User = mongoose.model('user', UserSchema);
