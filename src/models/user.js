@@ -19,10 +19,11 @@ const UserSchema = new Schema({
         },
         required: [true, 'Password is required.']
     },
-    admin: {
-        type: Boolean,
-        default: false
-    }
+    messages: [{
+        type: Schema.Types.ObjectId,
+        ref: 'message',
+        default: ['']
+    }]
 });
 
 const User = mongoose.model('user', UserSchema);

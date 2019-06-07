@@ -9,27 +9,27 @@ const Message = mongoose.model('message')
 
 describe('the message_controller', () => {
     msg = new Message({
-        name: 'Test Message',
+        author: 'Test Message',
         message: 'Content'
     })
 
     user = new User({
-        name: 'Test User',
+        author: 'Test User',
         password: 'Password',
         admin: true
     })
 
-    noname = new User({
+    noauthor = new User({
         message: 'Content'
     })
 
     nocontent = new User ({
-        name:'Test Message'
+        author:'Test Message'
     })
 
     it('can fetch a list of messages', (done) => {
         request(app)
-            .get('/api/messages')
+            .get('/api/message/all')
             .end(function (err, res) {
                 expect(res.statusCode).to.equal(200)
                 expect(res.body).to.be.empty
@@ -45,7 +45,7 @@ describe('the message_controller', () => {
                 expect(res.statusCode).to.equal(200)
                 var token = 'Bearer ' + res.body.token
                 request(app)
-                    .post('/api/messages')
+                    .post('/api/message/')
                     .send(msg)
                     .set({ 'Authorization': token })
                     .end(function (err, res) {
@@ -57,7 +57,7 @@ describe('the message_controller', () => {
 
     it('throws an error when not logged in on posting a message', (done) => {
         request(app)
-        .post('/api/messages')
+        .post('/api/message/')
         .send(msg)
         .end(function(err,res) {
             expect(res.body.Error).to.equal('No token provided.')
@@ -65,7 +65,7 @@ describe('the message_controller', () => {
         })
     })
 
-    it('throws an error when message-name is not provided', (done) => {
+    it('throws an error when message-author is not provided', (done) => {
         request(app)
         .post('/api/user/register')
         .send(user)
@@ -74,12 +74,12 @@ describe('the message_controller', () => {
             expect(res.body.auth).to.equal(true)
             var token = 'Bearer ' + res.body.token
             request(app)
-            .post('/api/messages')
-            .send(noname)
+            .post('/api/message')
+            .send(noauthor)
             .set({'Authorization' : token})
             .end(function(err,res) {
                 expect(res.statusCode).to.equal(401)
-                expect(res.body.Error).to.equal('No name provided')
+                expect(res.body.Error).to.equal('No author provided')
                 done()
             })
         })
@@ -94,7 +94,7 @@ describe('the message_controller', () => {
             expect(res.body.auth).to.equal(true)
             var token = 'Bearer ' + res.body.token
             request(app)
-            .post('/api/messages')
+            .post('/api/message')
             .send(nocontent)
             .set({'Authorization' : token})
             .end(function(err,res) {

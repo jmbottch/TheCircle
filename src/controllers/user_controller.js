@@ -20,14 +20,13 @@ function create(req, res) {
         var hashedPassword = bcrypt.hashSync(req.body.password, 8);
         User.create({
             name: req.body.name,
-            nickname: req.body.name,
             password: hashedPassword
         })
             .then(madeUser => {
                 var token = jwt.sign({ id: madeUser._id }, config.secret, {
                     expiresIn: 86400 // expires in 24 hours
                 });
-                res.status(200).send({ Message: "User created succesfully.", auth: true, token: token });
+                res.status(200).send({ Message: "User created succesfully.", auth: true, token: token, userId: madeUser._id});
             })
             .catch((err) => {
                 if (err.name == 'MongoError' && err.code == 11000) {
