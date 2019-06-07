@@ -37,7 +37,6 @@ function create(req, res) {
       })
       .catch(err => {
         Message.remove(msg)
-        console.log(err);
         res.status(401).send({Error:'Error while pushing Message to Host'})
       })
     })
