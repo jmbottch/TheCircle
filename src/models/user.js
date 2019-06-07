@@ -23,7 +23,13 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'message',
         default: ['']
-    }]
+    }],
+    kudos : [
+        {
+            type: Number,
+            default: 0
+        }
+    ],
 });
 
 const User = mongoose.model('user', UserSchema);
