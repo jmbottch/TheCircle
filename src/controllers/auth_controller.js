@@ -12,6 +12,7 @@ function login(req, res) {
     } else {
         User.findOne({ name: req.body.name })
         .then(user => {
+            console.log(user)
             var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) {
                 res.status(401).send({ Error: 'Password does not match.' })
@@ -20,7 +21,7 @@ function login(req, res) {
                 var token = jwt.sign({ id: user._id }, config.secret, {
                     expiresIn: 86400 // expires in 24 hours
                 });
-                res.status(200).send({ auth: true, token: token, userId: madeUser._id });
+                res.status(200).send({ auth: true, token: token, userId: user._id });
             }
         })
         .catch(error => {
