@@ -52,7 +52,6 @@ app.post('/api/message/', function (req, res) {
       })
       .catch(err => {
         Message.remove(msg)
-        console.log(err);
         res.status(401).send({Error:'Error while pushing Message to Host'})
       })
     })
@@ -61,7 +60,6 @@ app.post('/api/message/', function (req, res) {
       res.status(401).send({Error:'Host not found'})
     })
     .catch(err => {
-      console.log(err);
       res.status(401).send({Error: 'Error while creating Message'})
     })
   })
