@@ -20,7 +20,9 @@ function create(req, res) {
         var hashedPassword = bcrypt.hashSync(req.body.password, 8);
         User.create({
             name: req.body.name,
-            password: hashedPassword
+            password: hashedPassword,
+            kudos: req.body.kudos,
+            profilePicture: req.body.profilePicture
         })
             .then(madeUser => {
                 var token = jwt.sign({ id: madeUser._id }, config.secret, {
