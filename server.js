@@ -80,7 +80,7 @@ io.on('connection', socket => {
   //     socket.emit('messages', messages);
   // });
 
-  //io.sockets.emit('messages', messages);
+  io.sockets.emit('messages', messages);
   console.log(`Socket ${socket.id} has connected`);
 });
 
