@@ -27,7 +27,7 @@ const UserSchema = new Schema({
     kudos :
         {
             type: Number,
-            default: 0
+            default: 420
         }
 });
 
