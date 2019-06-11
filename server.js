@@ -6,6 +6,7 @@ const app = express();
 var mongoose = require('mongoose');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+io.origins('*:*')
 
 app.use(cors());
 app.use(bodyParser.json());
