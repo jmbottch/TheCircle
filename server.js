@@ -7,6 +7,8 @@ const app = express();
 var mongoose = require('mongoose');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+io.origins('*:*')
+app.options('*', cors());
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -31,12 +33,8 @@ mongodb.createDevConnection();
 var messages = [];
 
 function emitNewMsg(userId) {
-  User.findById(userId, { __v: 0 })
-    .populate('messages')
-    .then(foundUser => {
-      console.log('emitting:')
-      io.sockets.emit('messages', foundUser.messages);
-    });
+  console.log('emitting')
+      io.emit('messages', userId);
 }
 
 app.post('/api/message/', function (req, res) {
@@ -69,12 +67,13 @@ app.post('/api/message/', function (req, res) {
 
 io.on('connection', socket => {
   socket.on('getMsgs', userId => {
-    User.findById(userId, { __v: 0 })
-      .populate('messages')
-      .then(foundUser => {
-        console.log('emitting:')
-        socket.emit('getMsgs', foundUser.messages);
-      });
+    // User.findById(userId, { __v: 0 })
+    //   .populate('messages')
+    //   .then(foundUser => {
+    //     console.log('emitting:')
+    //     socket.emit('getMsgs', foundUser.messages);
+    //   });
+    this.emitNewMsg();
   });
 
   //   socket.on('addMsg', msg => {
@@ -82,11 +81,11 @@ io.on('connection', socket => {
   //     socket.emit('messages', messages);
   // });
 
-  //io.sockets.emit('messages', messages);
+  io.sockets.emit('messages', messages);
   console.log(`Socket ${socket.id} has connected`);
 });
 
-http.listen(process.env.PORT | 5000, () => {
+http.listen(process.env.PORT || 5000, () => {
   console.log('server is running on port 5000');
 });
 
