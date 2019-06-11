@@ -31,7 +31,8 @@ mongodb.createDevConnection();
 var messages = [];
 
 function emitNewMsg(userId) {
-      io.sockets.emit('messages', userId);
+  console.log('emitting')
+      io.emit('messages', userId);
 }
 
 app.post('/api/message/', function (req, res) {
