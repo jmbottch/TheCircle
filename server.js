@@ -31,12 +31,7 @@ mongodb.createDevConnection();
 var messages = [];
 
 function emitNewMsg(userId) {
-  User.findById(userId, { __v: 0 })
-    .populate('messages')
-    .then(foundUser => {
-      console.log('emitting:')
-      io.sockets.emit('messages', foundUser.messages);
-    });
+      io.sockets.emit('messages', userId);
 }
 
 app.post('/api/message/', function (req, res) {
@@ -69,12 +64,13 @@ app.post('/api/message/', function (req, res) {
 
 io.on('connection', socket => {
   socket.on('getMsgs', userId => {
-    User.findById(userId, { __v: 0 })
-      .populate('messages')
-      .then(foundUser => {
-        console.log('emitting:')
-        socket.emit('getMsgs', foundUser.messages);
-      });
+    // User.findById(userId, { __v: 0 })
+    //   .populate('messages')
+    //   .then(foundUser => {
+    //     console.log('emitting:')
+    //     socket.emit('getMsgs', foundUser.messages);
+    //   });
+    this.emitNewMsg();
   });
 
   //   socket.on('addMsg', msg => {
