@@ -17,11 +17,8 @@ function create(req, res) {
     if (!req.body.password) {
         res.status(401).send({ Error: 'No password provided' })
     } else {
-        var hashedPassword = bcrypt.hashSync(req.body.password, 8);
-        User.create({
-            name: req.body.name,
-            password: hashedPassword
-        })
+        req.body.password = bcrypt.hashSync(req.body.password, 8);
+        User.create(req.body)
             .then(madeUser => {
                 var token = jwt.sign({ id: madeUser._id }, config.secret, {
                     expiresIn: 86400 // expires in 24 hours

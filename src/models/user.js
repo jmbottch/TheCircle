@@ -19,6 +19,7 @@ const UserSchema = new Schema({
         },
         required: [true, 'Password is required.']
     },
+    profilePicture: String,
     messages: [{
         type: Schema.Types.ObjectId,
         ref: 'message',
@@ -27,7 +28,7 @@ const UserSchema = new Schema({
     kudos :
         {
             type: Number,
-            default: 0
+            default: 420
         }
 });
 

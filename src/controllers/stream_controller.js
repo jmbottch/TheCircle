@@ -4,7 +4,7 @@ const StreamMdl = require('../models/stream');
 //messages and version are omitted from the results
 function getAll(req, res) {
     StreamMdl.find({}, { messages: 0, __v: 0 })
-        .populate('host', 'name')
+        .populate('host', 'name profilePicture kudos')
         .then(streams => {
             res.status(200).send(streams);
         })
