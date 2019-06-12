@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema({
+    authorname: {
+        type:Schema.Types.String,
+        ref:'user',
+        required: [true, 'Authorname is required']
+    },
     author: {
         type: Schema.Types.ObjectId,
         ref: 'user',

@@ -27,6 +27,7 @@ function login(req, res) {
                     userId: user._id,
                     username: user.name,
                     kudos: user.kudos
+                    
                  });
             }
         })
