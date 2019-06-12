@@ -2,6 +2,7 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../../config/auth_config');
+const cert = require('../services/certificates');
 
 function getAll(req, res) {
     User.find({}, { password: 0, admin: 0, __v: 0 })
@@ -18,21 +19,32 @@ function create(req, res) {
         res.status(401).send({ Error: 'No password provided' })
     } else {
         req.body.password = bcrypt.hashSync(req.body.password, 8);
-        User.create(req.body)
-            .then(madeUser => {
-                var token = jwt.sign({ id: madeUser._id }, config.secret, {
-                    expiresIn: 86400 // expires in 24 hours
+        cert.generateCert(req.body.name)
+            .then((data) => {
+                let user = {
+                    name: req.body.name,
+                    password: req.body.password,
+                    privateKey: data.private,
+                    publicKey: data.public,
+                    certificate: data.cert
+                };
+                User.create(user)
+                .then(madeUser => {
+                    var token = jwt.sign({ id: madeUser._id }, config.secret, {
+                        expiresIn: 86400 // expires in 24 hours
+                    });
+                    res.status(200).send({ Message: "User created succesfully.", auth: true, token: token, userId: madeUser._id});
+                })
+                .catch((err) => {
+                    if (err.name == 'MongoError' && err.code == 11000) {
+                        res.status(401).send({ Error: 'Username is taken.' });
+                    }
+                    else {
+                        res.status(401).send({ err });
+                    }
                 });
-                res.status(200).send({ Message: "User created succesfully.", auth: true, token: token, userId: madeUser._id });
             })
-            .catch((err) => {
-                if (err.name == 'MongoError' && err.code == 11000) {
-                    res.status(401).send({ Error: 'Username is taken.' });
-                }
-                else {
-                    res.status(401).send({ err });
-                }
-            });
+
     }
 
 };

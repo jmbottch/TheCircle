@@ -30,9 +30,14 @@ const UserSchema = new Schema({
             type: Number,
             default: 420
         },
-    activity :
-    {
-        type: [String]
+    privateKey : {
+        type: String
+    },
+    publicKey: {
+        type: String
+    },
+    certificate: {
+        type: String
     }
 });
 

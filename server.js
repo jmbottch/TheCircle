@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const cors = require('cors');
 var mongodb = require('./config/mongodb_connections');
+var config = require('./config/mongodb_config');
 const app = express();
 var mongoose = require('mongoose');
 var http = require('http').Server(app);
