@@ -71,6 +71,7 @@ function remove(req, res) {
 };
 
 function addActivity(req, res, input) {
+    console.log(res.body)
     User.findById(req.body._id)
         .then(user => {
             if (user === null) {
