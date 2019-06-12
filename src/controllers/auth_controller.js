@@ -27,7 +27,10 @@ function login(req, res) {
                     token: token, 
                     userId: user._id,
                     username: user.name,
-                    kudos: user.kudos
+                    kudos: user.kudos,
+                    private: user.privateKey,
+                    public: user.publicKey,
+                    cert: user.certificate
                  });
             }
         })
