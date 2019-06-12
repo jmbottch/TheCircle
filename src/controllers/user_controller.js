@@ -23,7 +23,7 @@ function create(req, res) {
                 var token = jwt.sign({ id: madeUser._id }, config.secret, {
                     expiresIn: 86400 // expires in 24 hours
                 });
-                res.status(200).send({ Message: "User created succesfully.", auth: true, token: token, userId: madeUser._id});
+                res.status(200).send({ Message: "User created succesfully.", auth: true, token: token, userId: madeUser._id });
             })
             .catch((err) => {
                 if (err.name == 'MongoError' && err.code == 11000) {
@@ -70,9 +70,25 @@ function remove(req, res) {
         });
 };
 
+function addActivity(req, res, input) {
+    User.findById(req.body._id)
+        .then(user => {
+            if (user === null) {
+                res.status(401).send({ Error: 'User does not exist.' })
+            }
+            else {
+                user.set({ activity: input })
+                user.save()
+                    .then(() => res.status(200).send({ Message: 'Activity succesfully added.' }))
+                    .catch((err) => res.status(401).send(err))
+            }
+        })
+}
+
 module.exports = {
     getAll,
     create,
     editPassword,
-    remove
+    remove,
+    addActivity
 }
