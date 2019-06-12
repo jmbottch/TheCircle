@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const activitySchema = new Schema({
+const ActivitySchema = new Schema({
     userid : {
         type: Schema.Types.ObjectId,
         ref: 'user'
@@ -13,3 +13,6 @@ const activitySchema = new Schema({
 }, {
     timestamps: true
 })
+
+const Activity = mongoose.model('activity', ActivitySchema);
+module.exports = Activity;

@@ -23,7 +23,7 @@ const streamroutes = require('./routes/stream_routes');
 
 const User = require('./src/models/user');
 const Message = require('./src/models/message')
-const Activity = require('./src/models/activity')
+
 
 //enabled routes
 userroutes(app);
@@ -42,7 +42,7 @@ app.post('/api/message/', function (req, res) {
           foundUser.save()
             .then(() => {
               emitNewMsg(req.body.host)
-              addActivity(req.body.author, 'Posted a messages')
+              UserController.addActivity(req.body.author, 'Posted a messages')
                 res.status(200).send({ Message: 'Message saved' })              
             })
             .catch(err => {
@@ -91,37 +91,7 @@ http.listen(process.env.PORT || 5000, () => {
   console.log('server is running on port 5000');
 });
 
- function addActivity(author, res, input) {
-  Activity.create({
-    userid : author,
-    activity: input
-  })
-    .then(activity => {
-      User.findById(author)
-    .then((user) => {
-      if(user === null) {
-        res.status(401).send({Error: 'User does not exist'})
-      } else {
-        user.activities.push(activity)
-        //user.push({activities : req.body})
-        console.log(user)
-      }
-    })
-  })
-  
-  // User.findById(req.body.host)
-  //     .then(user => {
-  //         if (user === null) {
-  //             res.status(401).send({ Error: 'User does not exist.' })
-  //         }
-  //         else {
-  //             user.set({ activity: input })
-  //             user.save()
-  //                 .then(() => res.status(200).send({ Message: 'Activity succesfully added.' }))
-  //                 .catch((err) => res.status(401).send(err))
-  //         }
-  //     })
-}
+ 
 
 module.exports = app;
 
