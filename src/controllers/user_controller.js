@@ -72,7 +72,7 @@ function remove(req, res) {
 
 function addActivity(req, res, input) {
     console.log(res.body)
-    User.findById(req.body._id)
+    User.findById(req.body.author)
         .then(user => {
             if (user === null) {
                 res.status(401).send({ Error: 'User does not exist.' })
