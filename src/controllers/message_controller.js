@@ -16,8 +16,8 @@ function getStreamMessages(req, res) {
   User.findById(req.params.id, { __v: 0})
   .populate('messages')
   .then(foundUser => {
-    UserController.addActivity('User entered a chat');
     res.status(200).send(foundUser.messages)
+    UserController.addActivity('User entered a chat');
   })
   .catch(err => {
     res.status(401).send(err)
