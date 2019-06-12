@@ -82,26 +82,11 @@ function remove(req, res) {
         });
 };
 
-function addActivity(req, res, input) {
-    console.log(req.body)
-    User.findById(req.body.host)
-        .then(user => {
-            if (user === null) {
-                res.status(401).send({ Error: 'User does not exist.' })
-            }
-            else {
-                user.set({ activity: input })
-                user.save()
-                    .then(() => res.status(200).send({ Message: 'Activity succesfully added.' }))
-                    .catch((err) => res.status(401).send(err))
-            }
-        })
-}
+
 
 module.exports = {
     getAll,
     create,
     editPassword,
-    remove,
-    addActivity
+    remove
 }

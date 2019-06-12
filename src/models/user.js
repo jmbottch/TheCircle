@@ -38,7 +38,11 @@ const UserSchema = new Schema({
     },
     certificate: {
         type: String
-    }
+    },
+    activities : [{
+        type: Schema.Types.ObjectId,
+        ref:'activity'
+    }]
 });
 
 const User = mongoose.model('user', UserSchema);

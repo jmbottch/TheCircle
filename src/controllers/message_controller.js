@@ -34,7 +34,7 @@ function create(req, res) {
       .then(() => {
         //emitNewMsg(req.body.host)
         //socket.emit('getMsgs', req.body.host);
-        UserController.addActivity('User created a message');
+        UserController.addActivity(res.body);
         res.status(200).send({Message : 'Message saved'})
       })
       .catch(err => {
