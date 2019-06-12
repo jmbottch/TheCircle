@@ -7,6 +7,7 @@ const app = express();
 var mongoose = require('mongoose');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var cert = require('./src/services/certificates');
 io.origins('*:*')
 app.options('*', cors());
 
@@ -32,6 +33,10 @@ mongodb.createDevConnection();
 
 
 app.post('/api/message/', function (req, res) {
+  let signature = req.body.signature;
+  let message = req.body.message;
+  let certificate = req.body.certificate;
+  let verified = cert.verifyMessage(signature, message, certificate);
   Message.create(req.body)
     .then(msg => {
       User.findById(req.body.host)
@@ -40,7 +45,7 @@ app.post('/api/message/', function (req, res) {
           foundUser.save()
             .then(() => {
               emitNewMsg(req.body.host)
-              res.status(200).send({ Message: 'Message saved' })
+              res.status(200).send({ Message: 'Message saved', Verified: verified });
             })
             .catch(err => {
               Message.remove(msg)
