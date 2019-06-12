@@ -29,7 +29,11 @@ const UserSchema = new Schema({
         {
             type: Number,
             default: 420
-        }
+        },
+    activity :
+    {
+        type: [String]
+    }
 });
 
 const User = mongoose.model('user', UserSchema);

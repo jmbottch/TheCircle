@@ -17,6 +17,7 @@ function getStreamMessages(req, res) {
   .populate('messages')
   .then(foundUser => {
     res.status(200).send(foundUser.messages)
+    UserController.addActivity('User entered a chat');
   })
   .catch(err => {
     res.status(401).send(err)
@@ -33,6 +34,7 @@ function create(req, res) {
       .then(() => {
         //emitNewMsg(req.body.host)
         //socket.emit('getMsgs', req.body.host);
+        UserController.addActivity('User created a message');
         res.status(200).send({Message : 'Message saved'})
       })
       .catch(err => {
