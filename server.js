@@ -29,12 +29,6 @@ streamroutes(app);
 
 mongodb.createDevConnection();
 
-var messages = [];
-
-function emitNewMsg(userId) {
-  console.log('emitting')
-      io.emit('messages', userId);
-}
 
 app.post('/api/message/', function (req, res) {
   Message.create(req.body)
@@ -66,23 +60,28 @@ app.post('/api/message/', function (req, res) {
 
 io.on('connection', socket => {
   socket.on('getMsgs', userId => {
-    // User.findById(userId, { __v: 0 })
-    //   .populate('messages')
-    //   .then(foundUser => {
-    //     console.log('emitting:')
-    //     socket.emit('getMsgs', foundUser.messages);
-    //   });
     this.emitNewMsg();
   });
 
-  //   socket.on('addMsg', msg => {
-  //     io.emit('messages', messages);
-  //     socket.emit('messages', messages);
-  // });
+  // socket.on('getGlobalViewers', () => {
+  //   console.log('Total connected sockets: ', io.engine.clientsCount)
+  //   io.emit('viewers', io.engine.clientsCount);
+  // })
 
-  io.sockets.emit('messages', messages);
+  socket.on('disconnect', (reason) => {
+    io.emit('viewers', io.engine.clientsCount);
+    console.log(`Socket ${socket.id} has disconnected`);
+  });
+
+  io.emit('viewers', io.engine.clientsCount);
+  //io.sockets.emit('messages');
   console.log(`Socket ${socket.id} has connected`);
 });
+
+function emitNewMsg(userId) {
+  console.log('emitting')
+  io.emit('messages', userId);
+}
 
 http.listen(process.env.PORT || 5000, () => {
   console.log('server is running on port 5000');
