@@ -12,6 +12,7 @@
     "jsonwebtoken": "^8.5.1",
     "mocha": "^6.1.4",
     "mongoose": "^5.5.10",
+    "node-forge": "^0.8.4",
     "nodemon": "^1.19.1",
     "socket.io": "^2.2.0",
     "supertest": "^4.0.2"

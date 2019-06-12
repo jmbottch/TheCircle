@@ -29,7 +29,16 @@ const UserSchema = new Schema({
         {
             type: Number,
             default: 420
-        }
+        },
+    privateKey : {
+        type: String
+    },
+    publicKey: {
+        type: String
+    },
+    certificate: {
+        type: String
+    }
 });
 
 const User = mongoose.model('user', UserSchema);

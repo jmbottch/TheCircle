@@ -1,6 +1,5 @@
 const UserController = require('../src/controllers/user_controller');
 const AuthController = require('../src/controllers/auth_controller');
-const VerificationController = require('../src/controllers/verification_controller');
 
 module.exports = (app) => {
     //

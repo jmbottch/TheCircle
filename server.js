@@ -19,6 +19,7 @@ app.use(express.static(__dirname));
 const userroutes = require('./routes/user_routes');
 const messageroutes = require('./routes/message_routes');
 const streamroutes = require('./routes/stream_routes');
+const verificationroutes = require('./routes/verification_routes');
 
 const User = require('./src/models/user');
 const Message = require('./src/models/message')
@@ -27,6 +28,7 @@ const Message = require('./src/models/message')
 userroutes(app);
 messageroutes(app);
 streamroutes(app);
+verificationroutes(app);
 
 mongodb.createDevConnection();
 
