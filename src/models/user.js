@@ -11,7 +11,6 @@ const UserSchema = new Schema({
         },
         required: [true, 'Name is required.']
     },
-    nickname: String,
     password: {
         type: String,
         validate: {
@@ -20,9 +19,25 @@ const UserSchema = new Schema({
         },
         required: [true, 'Password is required.']
     },
-    admin: {
-        type: Boolean,
-        default: false
+    profilePicture: String,
+    messages: [{
+        type: Schema.Types.ObjectId,
+        ref: 'message',
+        default: ['']
+    }],
+    kudos :
+        {
+            type: Number,
+            default: 420
+        },
+    privateKey : {
+        type: String
+    },
+    publicKey: {
+        type: String
+    },
+    certificate: {
+        type: String
     }
 });
 

@@ -4,8 +4,16 @@ const bcrypt = require('bcryptjs');
 const config = require('../../config/auth_config');
 
 function login(req, res) {
-    User.findOne({ name: req.body.name })
+    console.log("HIER!!!");
+    if(!req.body.name) {
+        res.status(401).send({Error:'No name provided'})
+    } else
+    if(!req.body.password) {
+        res.status(401).send({Error:'No Password provided'})
+    } else {
+        User.findOne({ name: req.body.name })
         .then(user => {
+            console.log(user)
             var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) {
                 res.status(401).send({ Error: 'Password does not match.' })
@@ -14,13 +22,23 @@ function login(req, res) {
                 var token = jwt.sign({ id: user._id }, config.secret, {
                     expiresIn: 86400 // expires in 24 hours
                 });
-                res.status(200).send({ auth: true, token: token });
+                res.status(200).send({ 
+                    auth: true, 
+                    token: token, 
+                    userId: user._id,
+                    username: user.name,
+                    kudos: user.kudos,
+                    private: user.privateKey,
+                    public: user.publicKey,
+                    cert: user.certificate
+                 });
             }
         })
         .catch(error => {
             res.status(401).send({ Error: error });
         });
-}
+    }
+    }
 
 function validateToken(req, res, next) {
     if (!req.headers.authorization) {
@@ -31,42 +49,12 @@ function validateToken(req, res, next) {
         return res.status(401).send({ Error: 'No token provided.' })
     }
     jwt.verify(token, config.secret, function (err, decoded) {
-        console.log(decoded)
         if (err) return res.status(401).send({ Error: 'Token is invalid.' })
         if (decoded) next();
     });
 }
 
-function isAdmin(req, res, next) {
-    User.findById({ _id: req.params.id })
-        .then(founduser => {
-            console.log(founduser);
-            if (founduser.admin) {
-                return res.status(200).send("Gebruiker is een administrator.")
-            } else {
-                return res.status(401).send({ Error: 'Gebruiker is geen administrator.' })
-            }
-        })
-        .catch(() => {
-            return res.status(401).send({ Error: 'Gebruiker niet gevonden.' })
-        });
-}
-
-function validateAdmin(req, res, next) {
-    User.findOne({ name: req.headers.name })
-        .then(foundUser => {
-            //console.log("admin = " + JSON.parse(foundUser.admin));
-            if (foundUser.admin) next();
-            else return res.status(401).send({ Error: 'Gebruiker is geen administrator.' });
-        })
-        .catch(() => {
-            return res.status(401).send({ Error: 'Gebruiker niet gevonden.' })
-        });
-}
-
 module.exports = {
     login,
-    validateToken,
-    isAdmin,
-    validateAdmin
+    validateToken
 }
