@@ -12,8 +12,8 @@ var dburl = process.env.NODE_ENV === 'production' ?
     'mongodb://localhost/' + env.dbDatabase;
 
 //var dburl_dev = 'mongodb://seeuser:seepass1@ds231537.mlab.com:31537/seechange';
-// var dburl_dev = 'mongodb://pineapple:yeetyeet1@ds235437.mlab.com:35437/circle';
-var dburl_dev = 'mongodb://localhost:27017/seeChange';
+var dburl_dev = 'mongodb://pineapple:yeetyeet1@ds235437.mlab.com:35437/circle';
+// var dburl_dev = 'mongodb://localhost:27017/seeChange';
 
 module.exports = {
     env,
