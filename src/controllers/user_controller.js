@@ -83,7 +83,7 @@ function remove(req, res) {
 };
 
 function addActivity(req, res, input) {
-    console.log(req.body.host)
+    console.log('request' + req.body.host)
     User.findById(req.body.host)
         .then(user => {
             if (user === null) {
