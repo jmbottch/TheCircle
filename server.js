@@ -3,14 +3,15 @@ const bodyParser = require('body-parser')
 const cors = require('cors');
 var mongodb = require('./config/mongodb_connections');
 var config = require('./config/mongodb_config');
+var nms_config = require('./config/nms_config');
 const app = express();
 var mongoose = require('mongoose');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var cert = require('./src/services/certificates');
+const NodeMediaServer = require('node-media-server');
 io.origins('*:*')
 app.options('*', cors());
-const ActivityController = require('./src/controllers/activity_controller');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -27,6 +28,7 @@ const User = require('./src/models/user');
 const Message = require('./src/models/message');
 const StreamMdl = require('./src/models/stream');
 
+const ActivityController = require('./src/controllers/activity_controller');
 
 
 //enabled routes
@@ -151,5 +153,8 @@ function emitNewMsg(userId) {
 http.listen(process.env.PORT || 5000, () => {
   console.log('server is running on port 5000');
 });
+
+var nms = new NodeMediaServer(nms_config)
+nms.run();
 
 module.exports = app;
