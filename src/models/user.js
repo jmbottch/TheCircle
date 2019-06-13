@@ -19,16 +19,20 @@ const UserSchema = new Schema({
         },
         required: [true, 'Password is required.']
     },
-    profilePicture: String,
+    profilePicture: {
+        type: String,
+        default: ''
+    },
     
     activities: [{
-        type: String
+        type: String,
+        default: []
     }],
 
     messages: [{
         type: Schema.Types.ObjectId,
         ref: 'message',
-        default: ['']
+        default: []
     }],
     kudos :
         {

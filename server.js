@@ -81,7 +81,8 @@ io.on('connection', socket => {
   // });
 
   socket.on('startWatching', function (userIds, fn) {
-    fn(addToViewers(userIds.host, userIds.viewer));
+    //fn(addToViewers(userIds.host, userIds.viewer));
+    ActivityController.addActivity(userIds.viewer, 'Started watching stream with host: ' + userIds.host)
   });
 
   // socket.on('stopWatching', userIds => {
@@ -98,6 +99,7 @@ io.on('connection', socket => {
   });
 
   io.emit('viewers', io.engine.clientsCount);
+  
   console.log(`Socket ${socket.id} has connected`);
 });
 
