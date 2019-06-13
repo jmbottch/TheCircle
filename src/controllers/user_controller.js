@@ -15,6 +15,16 @@ function getAll(req, res) {
         })
 }
 
+function getSingle(req, res) {
+    User.findById(req.params.id)
+    .then(user => {
+        res.status(200).send(user)
+    })
+    .catch(err => {
+        res.status(401).send(err)
+    })
+}
+
 function create(req, res) {
     if (!req.body.password) {
         res.status(401).send({ Error: 'No password provided' })
@@ -106,5 +116,6 @@ module.exports = {
     create,
     editPassword,
     remove,
-    addActivity
+    addActivity,
+    getSingle
 }
