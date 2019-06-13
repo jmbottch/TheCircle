@@ -9,5 +9,5 @@ module.exports = (app) => {
 
     //post a new message
     //find this route in server.js, bc of socket import errors
-    app.post('/api/message', MessageController.create);
+    //app.post('/api/message', MessageController.create);
 };
