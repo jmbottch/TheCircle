@@ -36,6 +36,7 @@ function create(req, res) {
                 let user = {
                     name: req.body.name,
                     password: req.body.password,
+                    profilePicture: req.body.profilePicture,
                     privateKey: data.private,
                     publicKey: data.public,
                     certificate: data.cert
