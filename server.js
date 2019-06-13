@@ -45,6 +45,8 @@ app.post('/api/message/', function (req, res) {
     .then(msg => {
       User.findById(req.body.host)
         .then(foundUser => {
+          msg.profilePicture = foundUser.profilePicture;
+          msg.save();
           foundUser.messages.push(msg)
           foundUser.save()
             .then(() => {
