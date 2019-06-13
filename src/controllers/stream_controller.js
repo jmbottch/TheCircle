@@ -1,6 +1,6 @@
 const StreamMdl = require('../models/stream');
 const MessageMdl = require('../models/message');
-const UserController = require('../controllers/user_controller');
+const ActivityController = require('../controllers/activity_controller');
 
 //Get function, returns all available streams
 //messages and version are omitted from the results
@@ -22,8 +22,11 @@ function create(req, res) {
     const newStream = new StreamMdl(req.body);
     newStream.save(err => {
         if (err) return res.status(500).send(err);
-        UserController.addActivity('User created a new stream');
-        return res.status(200).send(newStream); 
+        else {
+            ActivityController.addActivity(req.body.host, 'User created a new stream');
+            return res.status(200).send(newStream); 
+        }
+        
     });
 }
 

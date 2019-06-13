@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Activity = require('../models/activity')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../../config/auth_config');
@@ -76,7 +77,9 @@ function remove(req, res) {
             }
             else {
                 user.delete()
-                    .then(() => res.status(200).send({ Message: 'User succesfully removed.' }))
+                    .then(() => {
+                        res.status(200).send({ Message: 'User succesfully removed.' })
+                    })
                     .catch((err) => res.status(401).send(err))
             }
         });

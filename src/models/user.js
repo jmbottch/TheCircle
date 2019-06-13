@@ -20,6 +20,11 @@ const UserSchema = new Schema({
         required: [true, 'Password is required.']
     },
     profilePicture: String,
+    
+    activities: [{
+        type: String
+    }],
+
     messages: [{
         type: Schema.Types.ObjectId,
         ref: 'message',
@@ -38,7 +43,11 @@ const UserSchema = new Schema({
     },
     certificate: {
         type: String
-    }
+    },
+    activities : [{
+        type: Schema.Types.ObjectId,
+        ref:'activity'
+    }]
 });
 
 const User = mongoose.model('user', UserSchema);
