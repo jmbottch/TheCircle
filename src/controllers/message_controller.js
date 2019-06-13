@@ -17,7 +17,7 @@ function getStreamMessages(req, res) {
   .populate('messages')
   .then(foundUser => {
     res.status(200).send(foundUser.messages)
-    UserController.addActivity('User entered a chat');
+    UserController.addActivity('User entered a chat', req.body.author);
   })
   .catch(err => {
     res.status(401).send(err)
