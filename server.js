@@ -11,6 +11,7 @@ var cert = require('./src/services/certificates');
 io.origins('*:*')
 app.options('*', cors());
 const ActivityController = require('./src/controllers/activity_controller');
+const StreamController = require('./src/controllers/stream_controller');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -52,7 +53,8 @@ app.post('/api/message/', function (req, res) {
             .then(() => {
               emitNewMsg(req.body.host)
               ActivityController.addActivity(req.body.author, 'Posted a message')
-                res.status(200).send({ Message: 'Message saved', Verified: verified });            
+              console.log('Kudos toegevoegd aan u account');
+              res.status(200).send({ Message: 'Message saved', Verified: verified });            
             })
             .catch(err => {
               Message.remove(msg)

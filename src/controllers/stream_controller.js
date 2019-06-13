@@ -1,6 +1,10 @@
 const StreamMdl = require('../models/stream');
 const MessageMdl = require('../models/message');
 const ActivityController = require('../controllers/activity_controller');
+const UserController = require('../controllers/user_controller');
+const UserMdl = require('../models/user');
+const mongoose = require('mongoose');
+mongoose.set('useFindAndModify', false);
 
 //Get function, returns all available streams
 //messages and version are omitted from the results
@@ -39,8 +43,27 @@ function update(req, res) {
     })
 }
 
+function deactivateStream(req, res) {
+    var today = new Date();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    console.log(today);
+    StreamMdl.findByIdAndUpdate(req.params.id, {active: false}, {new: true}, (err, updatedStrm))
+    .populate('host')
+    .then(updatedStrm => {
+        var dif = updatedStrm.host.kudos + (Math.pow(2,(Math.floor((Math.abs(today-updatedStrm.createdAt))/1000/60/60))));
+        UserMdl.findByIdAndUpdate(updatedStrm.host, {kudos: dif}, {new: true}, (err, updatedUsr) => {
+            console.log(updatedUsr);
+            if(err) return res.status(401).send(err);
+            else return res.status(200).send({msg: 'Stream ended succesfully!'});
+        })
+        console.log(dif);
+        if(err) return res.status(401).send(err);
+    })
+}
+
 module.exports = {
     getAll,
     create,
-    update
+    update,
+    deactivateStream
 }

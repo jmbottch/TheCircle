@@ -20,7 +20,7 @@ const UserSchema = new Schema({
         required: [true, 'Password is required.']
     },
     profilePicture: String,
-    
+
     activities: [{
         type: String
     }],
@@ -33,7 +33,7 @@ const UserSchema = new Schema({
     kudos :
         {
             type: Number,
-            default: 420
+            default: 0
         },
     privateKey : {
         type: String

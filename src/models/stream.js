@@ -18,7 +18,11 @@ const StreamSchema = new Schema({
     viewers: [{
         type: String,
         default: []
-    }]
+    }],
+    active: {
+        type: Boolean,
+        default: true
+    }
 }, {
     timestamps: true
 });
