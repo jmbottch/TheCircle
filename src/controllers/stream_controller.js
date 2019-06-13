@@ -15,6 +15,21 @@ function getAll(req, res) {
         })
 }
 
+function getViewers(req, res) {
+    StreamMdl.findById(req.params.id)
+        .then(strm => {
+            if (strm == null) {
+                return res.status(401).send('Stream not found with host: ' + req.params.id)
+            } else {
+                //console.log(strm.viewers.length);
+                return res.status(200).send({'stream': req.params.id, 'viewers': strm.viewers.length});
+            }
+        })
+        .catch(err => {
+            res.status(401).send(err)
+        })
+}
+
 //Create function, body should have these properties:
 //  title: String,
 //  host: User  (ObjectId)
@@ -24,16 +39,16 @@ function create(req, res) {
         if (err) return res.status(500).send(err);
         else {
             ActivityController.addActivity(req.body.host, 'User created a new stream');
-            return res.status(200).send(newStream); 
+            return res.status(200).send(newStream);
         }
-        
+
     });
 }
 
 //Update function, URL parameters should have the streamId
 //  Body should have    title: String
 function update(req, res) {
-    StreamMdl.findByIdAndUpdate(req.params.streamId, req.body.title, {new: true}, (err, editedStream) => {
+    StreamMdl.findByIdAndUpdate(req.params.streamId, req.body.title, { new: true }, (err, editedStream) => {
         if (err) return res.stats(500).send(err);
         return res.send(editedStream);
     })
@@ -41,6 +56,7 @@ function update(req, res) {
 
 module.exports = {
     getAll,
+    getViewers,
     create,
     update
 }
