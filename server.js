@@ -9,6 +9,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 io.origins('*:*')
 app.options('*', cors());
+const ActivityController = require('./src/controllers/activity_controller');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -19,14 +20,17 @@ app.use(express.static(__dirname));
 const userroutes = require('./routes/user_routes');
 const messageroutes = require('./routes/message_routes');
 const streamroutes = require('./routes/stream_routes');
+const activityroutes = require('./routes/activity_routes');
 
 const User = require('./src/models/user');
 const Message = require('./src/models/message')
+
 
 //enabled routes
 userroutes(app);
 messageroutes(app);
 streamroutes(app);
+activityroutes(app);
 
 mongodb.createDevConnection();
 
@@ -40,7 +44,8 @@ app.post('/api/message/', function (req, res) {
           foundUser.save()
             .then(() => {
               emitNewMsg(req.body.host)
-              res.status(200).send({ Message: 'Message saved' })
+              ActivityController.addActivity(req.body.author, 'Posted a message')
+                res.status(200).send({ Message: 'Message saved' })              
             })
             .catch(err => {
               Message.remove(msg)
@@ -87,6 +92,8 @@ function emitNewMsg(userId) {
 http.listen(process.env.PORT || 5000, () => {
   console.log('server is running on port 5000');
 });
+
+ 
 
 module.exports = app;
 
