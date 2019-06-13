@@ -17,6 +17,7 @@ function getAll(req, res) {
 
 function getSingle(req, res) {
     User.findById(req.params.id)
+    .populate('activities messages')
     .then(user => {
         res.status(200).send(user)
     })
