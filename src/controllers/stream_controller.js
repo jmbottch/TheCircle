@@ -1,5 +1,6 @@
 const StreamMdl = require('../models/stream');
 const MessageMdl = require('../models/message');
+const UserMdl = require('../models/user');
 const ActivityController = require('../controllers/activity_controller');
 
 //Get function, returns all available streams
@@ -22,7 +23,7 @@ function getViewers(req, res) {
                 return res.status(401).send('Stream not found with host: ' + req.params.id)
             } else {
                 //console.log(strm.viewers.length);
-                return res.status(200).send({'stream': req.params.id, 'viewers': strm.viewers.length});
+                return res.status(200).send({ 'stream': req.params.id, 'viewers': strm.viewers.length });
             }
         })
         .catch(err => {
@@ -54,9 +55,27 @@ function update(req, res) {
     })
 }
 
+function deactivateStream(req, res) {
+    var today = new Date();
+    StreamMdl.findByIdAndUpdate(req.params.id, { active: false }, { new: true })
+        .populate('host')
+        .then(updatedStrm => {
+            var dif = updatedStrm.host.kudos + (Math.pow(2, (Math.floor((Math.abs(today - updatedStrm.createdAt)) / 1000 / 60 / 60))));
+            UserMdl.findByIdAndUpdate(updatedStrm.host, { kudos: dif }, { new: true })
+            .then(updatedUsr => {
+                console.log(updatedUsr.kudos);
+                return res.status(200).send({ msg: 'Stream ended succesfully!' });
+            })
+            .catch(err => {
+                if (err) return res.status(401).send(err);
+            })
+        })
+}
+
 module.exports = {
     getAll,
     getViewers,
     create,
-    update
+    update,
+    deactivateStream
 }

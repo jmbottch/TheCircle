@@ -37,7 +37,7 @@ const UserSchema = new Schema({
     kudos :
         {
             type: Number,
-            default: 420
+            default: 10
         },
     privateKey : {
         type: String

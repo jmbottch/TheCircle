@@ -13,4 +13,6 @@ module.exports = (app) => {
 
     //get amount of viewers for a stream
     app.get('/api/stream/:id/viewers', StreamController.getViewers);
+
+    app.put('/api/stream/:id/deactivate', StreamController.deactivateStream);
 };
