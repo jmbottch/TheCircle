@@ -139,10 +139,10 @@ function removeFromOne(host, socketid) {
       } else {
         var index = strm.viewers.indexOf(socketid);
         if (index != -1) {
-          console.log('strm pre', strm.viewers)
+          //console.log('strm pre', strm.viewers)
           strm.viewers.splice(index, 1);
           strm.save();
-          console.log('strm post', strm.viewers)
+         // console.log('strm post', strm.viewers)
 
         }
       }
@@ -166,10 +166,10 @@ function removeFromViewers(host, socketid) {
               //i.save(); //<-- doesnt save
               StreamMdl.findById(i._id)
               .then(newStrm => {
-                console.log('unsaved', newStrm);
+                //console.log('unsaved', newStrm);
                 newStrm.viewers = i.viewers;
                 newStrm.save();
-                console.log('saved', newStrm);
+                //console.log('saved', newStrm);
               })
             }
           }
