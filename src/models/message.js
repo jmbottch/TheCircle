@@ -15,6 +15,10 @@ const MessageSchema = new Schema({
     message: {
         type: String,
         required: [true, 'Message is required.']
+    },
+    profilePicture: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true

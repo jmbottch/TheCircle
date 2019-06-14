@@ -14,6 +14,8 @@ module.exports = (app) => {
     //
     //get all users
     app.get('/api/users/', UserController.getAll);
+    //get a single user
+    app.get('/api/user/:id', UserController.getSingle)
     //change password of an existing user with 'name, password, newPassword'
     app.put('/api/user/:id', AuthController.validateToken, UserController.editPassword);
     //remove a user from the database with 'name, password'

@@ -16,6 +16,17 @@ function getAll(req, res) {
         })
 }
 
+function getSingle(req, res) {
+    User.findById(req.params.id)
+    .populate('activities messages')
+    .then(user => {
+        res.status(200).send(user)
+    })
+    .catch(err => {
+        res.status(401).send(err)
+    })
+}
+
 function create(req, res) {
     if (!req.body.password) {
         res.status(401).send({ Error: 'No password provided' })
@@ -26,6 +37,7 @@ function create(req, res) {
                 let user = {
                     name: req.body.name,
                     password: req.body.password,
+                    profilePicture: req.body.profilePicture,
                     privateKey: data.private,
                     publicKey: data.public,
                     certificate: data.cert
@@ -108,4 +120,5 @@ module.exports = {
     editPassword,
     remove,
     addActivity,
+    getSingle
 }
