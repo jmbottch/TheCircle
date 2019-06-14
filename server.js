@@ -10,6 +10,8 @@ var io = require('socket.io')(http);
 var cert = require('./src/services/certificates');
 io.origins('*:*')
 app.options('*', cors());
+mongoose.set('useFindAndModify', false);
+
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -135,8 +137,14 @@ function removeFromOne(host, socketid) {
       if (strm == null) {
         console.log('Stream not found with host: ' + host)
       } else {
-        strm.viewers.splice(socketid, 1);
-        strm.save();
+        var index = strm.viewers.indexOf(socketid);
+        if (index != -1) {
+          console.log('strm pre', strm.viewers)
+          strm.viewers.splice(index, 1);
+          strm.save();
+          console.log('strm post', strm.viewers)
+
+        }
       }
     });
 }
@@ -151,10 +159,19 @@ function removeFromViewers(host, socketid) {
           for (let i of strms) {
             var index = i.viewers.indexOf(socketid);
             if (index != -1) {
+              //console.log('viewers PRE', i.viewers)
+              //console.log('index', index)
               i.viewers.splice(index, 1);
-              i.save();
+              //console.log('viewers post', i.viewers)
+              //i.save(); //<-- doesnt save
+              StreamMdl.findById(i._id)
+              .then(newStrm => {
+                console.log('unsaved', newStrm);
+                newStrm.viewers = i.viewers;
+                newStrm.save();
+                console.log('saved', newStrm);
+              })
             }
-            // i.viewers.splice(socketid, 1);
           }
         }
       });
