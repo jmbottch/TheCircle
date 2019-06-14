@@ -150,8 +150,8 @@ function removeFromViewers(host, socketid) {
         } else {
           for (let i of strms) {
             var index = i.viewers.indexOf(socketid);
-            if (index !== -1) {
-              array.splice(index, 1);
+            if (index != -1) {
+              i.viewers.splice(index, 1);
               i.save();
             }
             // i.viewers.splice(socketid, 1);
