@@ -130,7 +130,7 @@ function addToViewers(host, socketid) {
 };
 
 function removeFromOne(host, socketid) {
-  StreamMdl.findOne({host: host})
+  StreamMdl.findOne({ host: host })
     .then(strm => {
       if (strm == null) {
         console.log('Stream not found with host: ' + host)
@@ -149,8 +149,12 @@ function removeFromViewers(host, socketid) {
           console.log('no streams found')
         } else {
           for (let i of strms) {
-            i.viewers.splice(socketid, 1);
-            i.save();
+            var index = i.viewers.indexOf(socketid);
+            if (index !== -1) {
+              array.splice(index, 1);
+              i.save();
+            }
+            // i.viewers.splice(socketid, 1);
           }
         }
       });
