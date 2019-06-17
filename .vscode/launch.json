@@ -9,6 +9,16 @@
             "request": "launch",
             "name": "Launch Program",
             "program": "${workspaceFolder}\\server.js"
+        },
+        {
+            "name": "Nodemon",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "nodemon",
+            "program": "${workspaceFolder}\\server.js",
+            "restart": true,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
         }
     ]
 }

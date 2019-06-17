@@ -85,12 +85,32 @@ function generateCert(name) {
   return promise;
 }
 
+function tlsConnection(app) {
+  app.get('/api/private', encryptedConnection);
+}
+
+function encryptedConnection(req, res) {
+  res.status(200).json('test');
+}
+
 function verifyMessage(signature, message, cert) {
   const msgD = forge.md.sha256.create();
   msgD.update(message);
   const certi = forge.pki.certificateFromPem(cert);
   let verified = certi.publicKey.verify(msgD.digest().bytes(), signature);
   return verified;
+}
+
+function encryptCredentialReversed(cred) {
+  var key = forge.random.getBytesSync(16);
+  var iv = forge.random.getBytesSync(16);
+
+  let keyHex = forge.util.bytesToHex(key);
+  let ivHex = forge.util.bytesToHex(iv);
+}
+
+function decryptCredentialReversed(cred) {
+  
 }
 
 function encryptCredential(cred) {
@@ -141,21 +161,42 @@ function encryptCredential(cred) {
   //   f2: splitEnc2
   // });
 
-  let response = { 
-    k: keyHex,
-    i: ivHex,
-    e: encryptedHex
-  };
-  decryptMessage(response);
+  // let response = { 
+  //   k: keyHex,
+  //   i: ivHex,
+  //   e: encryptedHex
+  // };
+
+  let response = keyHex.concat(ivHex, [encryptedHex]);
+  // decryptMessage(response);
   return response;
 }
 
 function decryptMessage(response) {
-  console.log(response);
-  let keyBytes = forge.util.hexToBytes(response.k);
-  let ivBytes = forge.util.hexToBytes(response.i);
-  let encBytes = forge.util.hexToBytes(response.e);
-  console.log(encBytes);
+  // console.log(response);
+  // let keyBytes = forge.util.hexToBytes(response.k);
+  // let ivBytes = forge.util.hexToBytes(response.i);
+  // let encBytes = forge.util.hexToBytes(response.e);
+  // console.log({
+  //   enc: encBytes
+  // });
+
+  let keyHex = response.substring(0, 32);
+  let ivHex = response.substring(32, 64);
+  let encHex = response.substring(64, response.length);
+
+  let keyBytes = forge.util.hexToBytes(keyHex);
+  let ivBytes = forge.util.hexToBytes(ivHex);
+  let encBytes = forge.util.hexToBytes(encHex);
+
+  let decipher = forge.cipher.createDecipher('AES-CBC', keyBytes);
+  decipher.start({ iv: ivBytes });
+  decipher.update(forge.util.createBuffer(encBytes));
+  console.log(decipher.finish());
+  let deciphered = decipher.output;
+  console.log({
+    dec: deciphered
+  });
   // let decipher = forge.cipher.createDecipher('AES-CBC', )
 }
   // const algorithm = 'aes-192-cbc';
@@ -229,5 +270,7 @@ module.exports = {
     verifyMessage,
     checkPath,
     generateCert,
-    encryptCredential
+    encryptCredential,
+    tlsConnection,
+    encryptedConnection
 };
