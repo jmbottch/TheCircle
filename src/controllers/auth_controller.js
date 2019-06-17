@@ -2,6 +2,7 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const config = require('../../config/auth_config');
+const cert = require('../services/certificates');
 
 function login(req, res) {
     //console.log("HIER!!!");
@@ -13,7 +14,13 @@ function login(req, res) {
     } else {
         User.findOne({ name: req.body.name })
         .then(user => {
-            //console.log(user)
+            console.log('hier is iets aan de hand');
+            let encryptedPubKey = cert.encryptCredential(user.publicKey);
+            let encryptedPrivkey = cert.encryptCredential(user.privateKey);
+            let encryptedCredential = cert.encryptCredential(user.certificate);
+
+            // console.log(encrypted);
+            // console.log(user)
             var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) {
                 res.status(401).send({ Error: 'Password does not match.' })
@@ -28,9 +35,9 @@ function login(req, res) {
                     userId: user._id,
                     username: user.name,
                     kudos: user.kudos,
-                    private: user.privateKey,
-                    public: user.publicKey,
-                    cert: user.certificate,
+                    private: encryptedPrivkey,
+                    public: encryptedPubKey,
+                    cert: encryptedCredential,
                     profilePicture: user.profilePicture
                  });
             }

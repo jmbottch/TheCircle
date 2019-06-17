@@ -4,7 +4,7 @@ const forge = require('node-forge');
 const fs = require('fs');
 
 var pki = forge.pki;
-// var passphrase = 'seeChange';
+var passphrase = 'seeChange';
 var PATH = process.cwd() + '/certificates';
 // var key = fs.readFileSync(process.cwd() + '/certificates/private.pem', 'utf8');
 // var pubkey = fs.readFileSync(process.cwd() + '/certificates/public.pem', 'utf8');
@@ -93,6 +93,93 @@ function verifyMessage(signature, message, cert) {
   return verified;
 }
 
+function encryptCredential(cred) {
+  console.log(cred);
+  var key = forge.random.getBytesSync(16);
+  var iv = forge.random.getBytesSync(16);
+
+  let keyHex = forge.util.bytesToHex(key);
+  let ivHex = forge.util.bytesToHex(iv);
+
+  // console.log({
+  //   cred: cred,
+  //   key: keyHex,
+  //   keyBin: key,
+  //   keyDec: forge.util.hexToBytes(keyHex),
+  //   keyLen: keyHex.length,
+  //   iv: ivHex,
+  //   ivBin: iv,
+  //   ivDec: forge.util.hexToBytes(ivHex),
+  //   ivLen: ivHex.length
+  // });
+
+  let credBytes = forge.util.createBuffer(cred);
+  console.log(credBytes);
+
+  var cipher = forge.cipher.createCipher('AES-CBC', key);
+  cipher.start({ iv: iv });
+  cipher.update(credBytes);
+  cipher.finish();
+  var encryptedHex = cipher.output.toHex();
+
+  // let encLen = encryptedString.length;
+  // console.log(encLen);
+  // let halfWay = encLen / 2;
+  // let splitEnc = encryptedString.substring(0, halfWay);
+  // let splitEnc2 = encryptedString.substring(halfWay, encLen);
+  // console.log(splitEnc);
+  // console.log(splitEnc2);
+  // let reversedEnc = splitEnc2.concat(splitEnc);
+  // let reversedEncryption = splitEnc2 + splitEnc;
+
+  // console.log({
+  //   k: keyHex,
+  //   i: ivHex,
+  //   e: encryptedHex,
+  //   re: reversedEnc,
+  //   f1: splitEnc,
+  //   f2: splitEnc2
+  // });
+
+  let response = { 
+    k: keyHex,
+    i: ivHex,
+    e: encryptedHex
+  };
+  decryptMessage(response);
+  return response;
+}
+
+function decryptMessage(response) {
+  console.log(response);
+  let keyBytes = forge.util.hexToBytes(response.k);
+  let ivBytes = forge.util.hexToBytes(response.i);
+  let encBytes = forge.util.hexToBytes(response.e);
+  console.log(encBytes);
+  // let decipher = forge.cipher.createDecipher('AES-CBC', )
+}
+  // const algorithm = 'aes-192-cbc';
+  // const password = 'testthisshit';
+
+  // const key = crypto.scryptSync(password, 'salt', 24);
+  // const iv = Buffer.alloc(16, 0);
+
+  // const cipher = crypto.createCipher(algorithm, key, iv);
+
+  // let encrypted = '';
+  // cipher.on('readable', () => {
+  //   let chunk;
+  //   while (null !== (chunk = cipher.read())) {
+  //     encrypted += chunk.toString('hex');
+  //   }
+  // });
+  // cipher.on('end', () => {
+  //   console.log(encrypted);
+  // });
+  // cipher.write(cred);
+  // cipher.end();
+  // return encrypted;
+
 // legacy code
     // let author = req.body.author;
     // let authorname = req.body.authorname;
@@ -142,4 +229,5 @@ module.exports = {
     verifyMessage,
     checkPath,
     generateCert,
+    encryptCredential
 };
