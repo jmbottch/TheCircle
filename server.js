@@ -40,7 +40,7 @@ activityroutes(app);
 mongodb.createDevConnection();
 
 app.get('/api/video', function(req, res) {
-  const path = './assets/sample.mp4'
+  const path = './assets/turk.mp4'
   const stat = fs.statSync(path)
   const fileSize = stat.size
   const range = req.headers.range
