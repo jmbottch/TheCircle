@@ -35,15 +35,22 @@ function getViewers(req, res) {
 //  title: String,
 //  host: User  (ObjectId)
 function create(req, res) {
-    const newStream = new StreamMdl(req.body);
-    newStream.save(err => {
-        if (err) return res.status(500).send(err);
-        else {
-            ActivityController.addActivity(req.body.host, 'User created a new stream');
-            return res.status(200).send(newStream);
-        }
-
-    });
+    StreamMdl.find({ host: req.body.host, active: true })
+        .then(fnd => {
+            if (fnd.length > 0) {
+                console.log(fnd)
+                return res.status(400).send({ Error: 'User is already live!' })}
+            else {
+                const newStream = new StreamMdl(req.body);
+                newStream.save(err => {
+                    if (err) return res.status(500).send(err);
+                    else {
+                        ActivityController.addActivity(req.body.host, 'User created a new stream');
+                        return res.status(200).send(newStream);
+                    }
+                });
+            }
+        })
 }
 
 //Update function, URL parameters should have the streamId
@@ -64,13 +71,13 @@ function deactivateStream(req, res) {
             var strmtime = updatedStrm.host.totalStreamTime + (Math.floor((Math.abs(today - updatedStrm.createdAt)) / 1000 / 60 / 60));
             //console.log('time', strmtime)
             UserMdl.findByIdAndUpdate(updatedStrm.host, { kudos: dif, totalStreamTime: strmtime }, { new: true })
-            .then(updatedUsr => {
-                console.log('updated kudos: ', updatedUsr.kudos);
-                return res.status(200).send({ msg: 'Stream ended succesfully!' });
-            })
-            .catch(err => {
-                if (err) return res.status(401).send(err);
-            })
+                .then(updatedUsr => {
+                    console.log('updated kudos: ', updatedUsr.kudos);
+                    return res.status(200).send({ msg: 'Stream ended succesfully!' });
+                })
+                .catch(err => {
+                    if (err) return res.status(401).send(err);
+                })
         })
 }
 

@@ -7,6 +7,7 @@ const cert = require('../services/certificates');
 
 function getAll(req, res) {
     Activity.find({}, { __v: 0})
+    
     .then(activities => {
       res.status(200).send(activities);
     })
