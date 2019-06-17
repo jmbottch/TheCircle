@@ -61,9 +61,11 @@ function deactivateStream(req, res) {
         .populate('host')
         .then(updatedStrm => {
             var dif = updatedStrm.host.kudos + (Math.pow(2, (Math.floor((Math.abs(today - updatedStrm.createdAt)) / 1000 / 60 / 60))));
-            UserMdl.findByIdAndUpdate(updatedStrm.host, { kudos: dif }, { new: true })
+            var strmtime = updatedStrm.host.totalStreamTime + (Math.floor((Math.abs(today - updatedStrm.createdAt)) / 1000 / 60 / 60));
+            //console.log('time', strmtime)
+            UserMdl.findByIdAndUpdate(updatedStrm.host, { kudos: dif, totalStreamTime: strmtime }, { new: true })
             .then(updatedUsr => {
-                console.log(updatedUsr.kudos);
+                console.log('updated kudos: ', updatedUsr.kudos);
                 return res.status(200).send({ msg: 'Stream ended succesfully!' });
             })
             .catch(err => {
