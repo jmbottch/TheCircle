@@ -1,9 +1,10 @@
 const crypto = require('crypto');
 const forge = require('node-forge');
 const fs = require('fs');
+const nodersa = require('node-rsa');
 
 var pki = forge.pki;
-// var passphrase = 'seeChange';
+var passphrase = 'seeChange';
 var PATH = process.cwd() + '/certificates';
 // var key = fs.readFileSync(process.cwd() + '/certificates/private.pem', 'utf8');
 // var pubkey = fs.readFileSync(process.cwd() + '/certificates/public.pem', 'utf8');
@@ -93,17 +94,17 @@ function verifyMessage(signature, message, cert) {
   return verified;
 }
 
-// function signMessageClientPublicKey(public, private) {
-//   var userPrivateKey = pki.privateKeyFromPem(private);
-//   var clientPublicKey = pki.publicKeyFromPem(public);
-//   var encrypted = clientPublicKey.encrypt(userPrivateKey);
-//   var encryptedHex = forge.util.bytesToHex(encrypted);
-//   console.log(encryptedHex);
-//   return encryptedHex;
-// }
-
-function signMessageClientPublicKey(client_publicKey, user_privateKey) {
-  
+function encryptPrivateKey(client, user) {
+  let encryptKey = pki.publicKeyFromPem(client);
+  let userPrivateKey = pki.privateKeyFromPem(user);
+  let encryptUserPrivateKey = pki.encryptRsaPrivateKey(userPrivateKey, passphrase);
+  let encrypted = encryptKey.encrypt(passphrase);
+  // console.log(encryptPrivateKey);
+  let response = {
+    e: encrypted,
+    eRsa: encryptUserPrivateKey
+  }
+  return response;
 }
 
 // legacy code
@@ -155,5 +156,5 @@ module.exports = {
     verifyMessage,
     checkPath,
     generateCert,
-    signMessageClientPublicKey
+    encryptPrivateKey
 };

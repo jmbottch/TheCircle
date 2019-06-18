@@ -15,8 +15,8 @@ function login(req, res) {
     } else {
         User.findOne({ name: req.body.name })
         .then(user => {
-            //console.log(user)
-            let encryptedPrivateKey = cert.signMessageClientPublicKey(clientPublicKey, user.privateKey);
+            // console.log(user)
+            let encryptedPrivateKey = cert.encryptPrivateKey(clientPublicKey, user.privateKey);
             var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) {
                 res.status(401).send({ Error: 'Password does not match.' })
