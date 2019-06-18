@@ -1,7 +1,5 @@
-const crypto = require('crypto');
 const forge = require('node-forge');
 const fs = require('fs');
-const nodersa = require('node-rsa');
 
 var pki = forge.pki;
 var passphrase = 'seeChange';
