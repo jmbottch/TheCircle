@@ -249,7 +249,7 @@ http.listen(process.env.PORT || 5000, () => {
   console.log('server is running on port 5000');
 });
 
-var nms = new NodeMediaServer(nms_config)
+var nms = new NodeMediaServer(nms_config.config)
 nms.run();
 
 module.exports = app;

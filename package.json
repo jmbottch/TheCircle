@@ -4,6 +4,7 @@
   "description": "Stub for a Mongo/Express server with auth",
   "main": "nodemon server.js",
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.0.18",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "chai": "^4.2.0",
