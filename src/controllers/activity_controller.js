@@ -16,11 +16,12 @@ function getAll(req, res) {
     });
 }
 
-function addActivity(author, input, res) {
+function addActivity(author, input, cat, res) {
     console.log(input) //author is retrieved from the request body
     Activity.create({                        //input is given through UserController.addActivity(req.body.author, 'Input Message')
       userid : author,  //create the activity
-      activity : input  
+      activity : input,
+      category: cat  
     })
       .then(activity => {
         User.findById(author) //find the author

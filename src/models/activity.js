@@ -8,7 +8,12 @@ const ActivitySchema = new Schema({
     },
     activity : {
         type: String
+    },
+    category: {
+        type: String
     }
+
+    //Possible categories: 'Ended stream', 'Created stream', 'Posted message', 'Started watching'
    
 }, {
     timestamps: true

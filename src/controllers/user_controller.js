@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const StreamModel = require('../models/stream');
 const Activity = require('../models/activity')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -42,20 +43,20 @@ function create(req, res) {
                     certificate: data.cert
                 };
                 User.create(user)
-                .then(madeUser => {
-                    var token = jwt.sign({ id: madeUser._id }, config.secret, {
-                        expiresIn: 86400 // expires in 24 hours
+                    .then(madeUser => {
+                        var token = jwt.sign({ id: madeUser._id }, config.secret, {
+                            expiresIn: 86400 // expires in 24 hours
+                        });
+                        res.status(200).send({ Message: "User created succesfully.", auth: true, token: token, userId: madeUser._id });
+                    })
+                    .catch((err) => {
+                        if (err.name == 'MongoError' && err.code == 11000) {
+                            res.status(401).send({ Error: 'Username is taken.' });
+                        }
+                        else {
+                            res.status(401).send({ err });
+                        }
                     });
-                    res.status(200).send({ Message: "User created succesfully.", auth: true, token: token, userId: madeUser._id});
-                })
-                .catch((err) => {
-                    if (err.name == 'MongoError' && err.code == 11000) {
-                        res.status(401).send({ Error: 'Username is taken.' });
-                    }
-                    else {
-                        res.status(401).send({ err });
-                    }
-                });
             })
 
     }
@@ -97,8 +98,8 @@ function remove(req, res) {
         });
 };
 
-function addActivity(req, res, input) {
-    console.log('request' + req.body.host)
+function addActivity(input, user) {
+    console.log(user)
     User.findById(req.body.host)
         .then(user => {
             if (user === null) {

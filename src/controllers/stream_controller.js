@@ -2,6 +2,9 @@ const StreamMdl = require('../models/stream');
 const MessageMdl = require('../models/message');
 const UserMdl = require('../models/user');
 const ActivityController = require('../controllers/activity_controller');
+const UserController = require('../controllers/user_controller');
+const mongoose = require('mongoose');
+mongoose.set('useFindAndModify', false);
 const fs = require('fs');
 const path = require('path');
 
@@ -81,7 +84,7 @@ function create(req, res) {
                 newStream.save(err => {
                     if (err) return res.status(500).send(err);
                     else {
-                        ActivityController.addActivity(req.body.host, 'User created a new stream');
+                        ActivityController.addActivity(req.body.host, 'User created a new stream', 'Created stream');
                         return res.status(200).send(newStream);
                     }
                 });
@@ -109,6 +112,7 @@ function deactivateStream(req, res) {
             UserMdl.findByIdAndUpdate(updatedStrm.host, { kudos: dif, totalStreamTime: strmtime }, { new: true })
                 .then(updatedUsr => {
                     console.log('updated kudos: ', updatedUsr.kudos);
+                    ActivityController.addActivity(req.body.host, 'User ended stream', 'Ended stream');
                     return res.status(200).send({ msg: 'Stream ended succesfully!' });
                 })
                 .catch(err => {

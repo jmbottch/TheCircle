@@ -3,13 +3,17 @@ const bodyParser = require('body-parser')
 const cors = require('cors');
 var mongodb = require('./config/mongodb_connections');
 var config = require('./config/mongodb_config');
+var nms_config = require('./config/nms_config');
 const app = express();
 var mongoose = require('mongoose');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var cert = require('./src/services/certificates');
+const NodeMediaServer = require('node-media-server');
 io.origins('*:*')
 app.options('*', cors());
+const ActivityController = require('./src/controllers/activity_controller');
+const StreamController = require('./src/controllers/stream_controller');
 mongoose.set('useFindAndModify', false);
 const fs = require('fs')
 const path = require('path')
@@ -28,8 +32,6 @@ const activityroutes = require('./routes/activity_routes');
 const User = require('./src/models/user');
 const Message = require('./src/models/message');
 const StreamMdl = require('./src/models/stream');
-
-const ActivityController = require('./src/controllers/activity_controller');
 
 //enabled routes
 userroutes(app);
@@ -88,7 +90,7 @@ app.post('/api/message/', function (req, res) {
           foundUser.save()
             .then(() => {
               emitNewMsg(req.body.host)
-              ActivityController.addActivity(req.body.author, 'Posted a message')
+              ActivityController.addActivity(req.body.author, 'Message: ' + req.body.message, 'Posted message')
               res.status(200).send({ Message: 'Message saved', Verified: verified });
             })
             .catch(err => {
@@ -114,7 +116,7 @@ io.on('connection', socket => {
   });
 
   socket.on('startWatching', userIds => {
-    ActivityController.addActivity(userIds.viewer, 'Started watching stream with host: ' + userIds.host)
+    ActivityController.addActivity(userIds.viewer, 'Started watching stream with host: ' + userIds.host, 'Started watching')
     addToViewers(userIds.host, socket.id);
     io.emit('viewSingle', 'new viewcount');
   });
@@ -246,5 +248,8 @@ function emitNewMsg(userId) {
 http.listen(process.env.PORT || 5000, () => {
   console.log('server is running on port 5000');
 });
+
+var nms = new NodeMediaServer(nms_config.config);
+nms.run();
 
 module.exports = app;
