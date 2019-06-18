@@ -90,7 +90,7 @@ app.post('/api/message/', function (req, res) {
           foundUser.save()
             .then(() => {
               emitNewMsg(req.body.host)
-              ActivityController.addActivity(req.body.author, 'Posted a message', 'Posted message')
+              ActivityController.addActivity(req.body.author, 'Message: ' + req.body.message, 'Posted message')
               res.status(200).send({ Message: 'Message saved', Verified: verified });
             })
             .catch(err => {
