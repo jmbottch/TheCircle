@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const StreamModel = require('../models/stream');
+const Activity = require('../models/activity')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../../config/auth_config');
@@ -14,6 +16,17 @@ function getAll(req, res) {
         })
 }
 
+function getSingle(req, res) {
+    User.findById(req.params.id)
+    .populate('activities messages')
+    .then(user => {
+        res.status(200).send(user)
+    })
+    .catch(err => {
+        res.status(401).send(err)
+    })
+}
+
 function create(req, res) {
     if (!req.body.password) {
         res.status(401).send({ Error: 'No password provided' })
@@ -24,25 +37,26 @@ function create(req, res) {
                 let user = {
                     name: req.body.name,
                     password: req.body.password,
+                    profilePicture: req.body.profilePicture,
                     privateKey: data.private,
                     publicKey: data.public,
                     certificate: data.cert
                 };
                 User.create(user)
-                .then(madeUser => {
-                    var token = jwt.sign({ id: madeUser._id }, config.secret, {
-                        expiresIn: 86400 // expires in 24 hours
+                    .then(madeUser => {
+                        var token = jwt.sign({ id: madeUser._id }, config.secret, {
+                            expiresIn: 86400 // expires in 24 hours
+                        });
+                        res.status(200).send({ Message: "User created succesfully.", auth: true, token: token, userId: madeUser._id });
+                    })
+                    .catch((err) => {
+                        if (err.name == 'MongoError' && err.code == 11000) {
+                            res.status(401).send({ Error: 'Username is taken.' });
+                        }
+                        else {
+                            res.status(401).send({ err });
+                        }
                     });
-                    res.status(200).send({ Message: "User created succesfully.", auth: true, token: token, userId: madeUser._id});
-                })
-                .catch((err) => {
-                    if (err.name == 'MongoError' && err.code == 11000) {
-                        res.status(401).send({ Error: 'Username is taken.' });
-                    }
-                    else {
-                        res.status(401).send({ err });
-                    }
-                });
             })
 
     }
@@ -76,14 +90,16 @@ function remove(req, res) {
             }
             else {
                 user.delete()
-                    .then(() => res.status(200).send({ Message: 'User succesfully removed.' }))
+                    .then(() => {
+                        res.status(200).send({ Message: 'User succesfully removed.' })
+                    })
                     .catch((err) => res.status(401).send(err))
             }
         });
 };
 
-function addActivity(req, res, input) {
-    console.log(req.body)
+function addActivity(input, user) {
+    console.log(user)
     User.findById(req.body.host)
         .then(user => {
             if (user === null) {
@@ -103,5 +119,6 @@ module.exports = {
     create,
     editPassword,
     remove,
-    addActivity
+    addActivity,
+    getSingle
 }

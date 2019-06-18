@@ -14,6 +14,14 @@ const StreamSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'user',
         required: [true, 'Host is required.']
+    },
+    viewers: [{
+        type: String,
+        default: []
+    }],
+    active: {
+        type: Boolean,
+        default: true
     }
 }, {
     timestamps: true

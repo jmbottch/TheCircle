@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const config = require('../../config/auth_config');
 
 function login(req, res) {
-    console.log("HIER!!!");
+    //console.log("HIER!!!");
     if(!req.body.name) {
         res.status(401).send({Error:'No name provided'})
     } else
@@ -13,7 +13,7 @@ function login(req, res) {
     } else {
         User.findOne({ name: req.body.name })
         .then(user => {
-            console.log(user)
+            //console.log(user)
             var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) {
                 res.status(401).send({ Error: 'Password does not match.' })
@@ -30,7 +30,8 @@ function login(req, res) {
                     kudos: user.kudos,
                     private: user.privateKey,
                     public: user.publicKey,
-                    cert: user.certificate
+                    cert: user.certificate,
+                    profilePicture: user.profilePicture
                  });
             }
         })
