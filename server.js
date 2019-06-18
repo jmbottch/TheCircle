@@ -12,14 +12,11 @@ var cert = require('./src/services/certificates');
 const NodeMediaServer = require('node-media-server');
 io.origins('*:*')
 app.options('*', cors());
-<<<<<<< HEAD
-=======
 const ActivityController = require('./src/controllers/activity_controller');
 const StreamController = require('./src/controllers/stream_controller');
 mongoose.set('useFindAndModify', false);
 const fs = require('fs')
 const path = require('path')
->>>>>>> 7034bc09627532fe4643a2f16935d124f360928e
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -36,12 +33,6 @@ const User = require('./src/models/user');
 const Message = require('./src/models/message');
 const StreamMdl = require('./src/models/stream');
 
-<<<<<<< HEAD
-const ActivityController = require('./src/controllers/activity_controller');
-
-
-=======
->>>>>>> 7034bc09627532fe4643a2f16935d124f360928e
 //enabled routes
 userroutes(app);
 messageroutes(app);
