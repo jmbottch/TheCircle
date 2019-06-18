@@ -3,7 +3,6 @@ const MessageMdl = require('../models/message');
 const UserMdl = require('../models/user');
 const ActivityController = require('../controllers/activity_controller');
 const UserController = require('../controllers/user_controller');
-const UserMdl = require('../models/user');
 const mongoose = require('mongoose');
 mongoose.set('useFindAndModify', false);
 
@@ -68,6 +67,7 @@ function deactivateStream(req, res) {
             UserMdl.findByIdAndUpdate(updatedStrm.host, { kudos: dif }, { new: true })
             .then(updatedUsr => {
                 console.log(updatedUsr.kudos);
+                ActivityController.addActivity(req.body.host, 'User ended the stream succesfully');
                 return res.status(200).send({ msg: 'Stream ended succesfully!' });
             })
             .catch(err => {

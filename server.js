@@ -28,8 +28,6 @@ const User = require('./src/models/user');
 const Message = require('./src/models/message');
 const StreamMdl = require('./src/models/stream');
 
-const ActivityController = require('./src/controllers/activity_controller');
-
 //enabled routes
 userroutes(app);
 messageroutes(app);
