@@ -84,7 +84,7 @@ function create(req, res) {
                 newStream.save(err => {
                     if (err) return res.status(500).send(err);
                     else {
-                        ActivityController.addActivity(req.body.host, 'User created a new stream', 'CreateStream');
+                        ActivityController.addActivity(req.body.host, 'User created a new stream', 'Created stream');
                         return res.status(200).send(newStream);
                     }
                 });
@@ -112,7 +112,7 @@ function deactivateStream(req, res) {
             UserMdl.findByIdAndUpdate(updatedStrm.host, { kudos: dif, totalStreamTime: strmtime }, { new: true })
                 .then(updatedUsr => {
                     console.log('updated kudos: ', updatedUsr.kudos);
-                    ActivityController.addActivity(req.body.host, 'User ended stream', 'EndStream');
+                    ActivityController.addActivity(req.body.host, 'User ended stream', 'Ended stream');
                     return res.status(200).send({ msg: 'Stream ended succesfully!' });
                 })
                 .catch(err => {

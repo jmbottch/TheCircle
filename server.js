@@ -90,7 +90,7 @@ app.post('/api/message/', function (req, res) {
           foundUser.save()
             .then(() => {
               emitNewMsg(req.body.host)
-              ActivityController.addActivity(req.body.author, 'Posted a message', 'PostMessage')
+              ActivityController.addActivity(req.body.author, 'Posted a message', 'Posted message')
               res.status(200).send({ Message: 'Message saved', Verified: verified });
             })
             .catch(err => {
@@ -116,7 +116,7 @@ io.on('connection', socket => {
   });
 
   socket.on('startWatching', userIds => {
-    ActivityController.addActivity(userIds.viewer, 'Started watching stream with host: ' + userIds.host, 'StartWatching')
+    ActivityController.addActivity(userIds.viewer, 'Started watching stream with host: ' + userIds.host, 'Started watching')
     addToViewers(userIds.host, socket.id);
     io.emit('viewSingle', 'new viewcount');
   });
