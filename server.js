@@ -12,6 +12,9 @@ io.origins('*:*')
 app.options('*', cors());
 const ActivityController = require('./src/controllers/activity_controller');
 const StreamController = require('./src/controllers/stream_controller');
+mongoose.set('useFindAndModify', false);
+const fs = require('fs')
+const path = require('path')
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -35,6 +38,40 @@ streamroutes(app);
 activityroutes(app);
 
 mongodb.createDevConnection();
+
+app.get('/api/video', function(req, res) {
+  const path = './assets/turk.mp4'
+  const stat = fs.statSync(path)
+  const fileSize = stat.size
+  const range = req.headers.range
+
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-")
+    const start = parseInt(parts[0], 10)
+    const end = parts[1]
+      ? parseInt(parts[1], 10)
+      : fileSize-1
+
+    const chunksize = (end-start)+1
+    const file = fs.createReadStream(path, {start, end})
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'video/mp4',
+    }
+
+    res.writeHead(206, head)
+    file.pipe(res)
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4',
+    }
+    res.writeHead(200, head)
+    fs.createReadStream(path).pipe(res)
+  }
+})
 
 app.post('/api/message/', function (req, res) {
   let signature = req.body.signature;
@@ -93,7 +130,7 @@ io.on('connection', socket => {
 
   socket.on('disconnect', () => {
     console.log(`Socket ${socket.id} has disconnected`);
-    removeFromViewers('all', socket.id);
+    removeFromViewers(socket.id);
     io.emit('viewers', io.engine.clientsCount);
     io.emit('viewSingle', 'new viewcount');
   });
@@ -123,38 +160,82 @@ function addToViewers(host, socketid) {
         return 'not added';
       } else {
         strm.viewers.push(socketid);
-        strm.save();
-        return 'added';
+        strm.save()
+          .then(sved => {
+            console.log('saved: ', sved);
+            return 'added';
+          })
       }
     });
 };
 
 function removeFromOne(host, socketid) {
-  StreamMdl.findOne({host: host})
+  StreamMdl.findOne({ host: host })
     .then(strm => {
       if (strm == null) {
         console.log('Stream not found with host: ' + host)
       } else {
-        strm.viewers.splice(socketid, 1);
-        strm.save();
+        var index = strm.viewers.indexOf(socketid);
+        if (index != -1) {
+          //console.log('strm pre', strm.viewers)
+          strm.viewers.splice(index, 1);
+          strm.save();
+          // console.log('strm post', strm.viewers)
+        }
       }
     });
 }
 
-function removeFromViewers(host, socketid) {
-  if (host == 'all') {
-    StreamMdl.find({})
-      .then(strms => {
-        if (strms == null) {
-          console.log('no streams found')
-        } else {
-          for (let i of strms) {
-            i.viewers.splice(socketid, 1);
-            i.save();
-          }
+function removeFromViewers(socketid) {
+  StreamMdl.find({})
+    .then(strms => {
+      if (strms == null) {
+        console.log('Error: No streams found')
+      } else {
+        for (let i of strms) {
+            var index = i.viewers.indexOf(socketid);
+            if (index != -1) {
+              //console.log('pre', i.viewers)
+              i.viewers.splice(index, 1);
+              i.save()
+                .then(saved => {
+                  console.log('saved: ', saved)
+                })
+            }
         }
-      });
-  }
+      }
+    })
+    .catch(err => {
+      console.log('Error: An error occured while fetching all streams: ', err);
+    })
+
+  // if (host == 'all') {
+  //   StreamMdl.find({})
+  //     .then(strms => {
+  //       if (strms == null) {
+  //         console.log('no streams found')
+  //       } else {
+  //         for (let i of strms) {
+  //           var index = i.viewers.indexOf(socketid);
+  //           if (index != -1) {
+  //             //console.log('viewers PRE', i.viewers)
+  //             //console.log('index', index)
+  //             i.viewers.splice(index, 1);
+  //             //console.log('viewers post', i.viewers)
+  //             //i.save(); //<-- doesnt save
+  //             StreamMdl.findById(i._id)
+  //             .then(newStrm => {
+  //               //console.log('unsaved', newStrm);
+  //               newStrm.viewers = i.viewers;
+  //               newStrm.save();
+  //               //console.log('saved', newStrm);
+  //             })
+  //           }
+  //         }
+  //       }
+  //     });
+  // }
+
 };
 
 function emitNewMsg(userId) {

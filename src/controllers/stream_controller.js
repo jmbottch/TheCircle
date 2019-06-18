@@ -5,6 +5,8 @@ const ActivityController = require('../controllers/activity_controller');
 const UserController = require('../controllers/user_controller');
 const mongoose = require('mongoose');
 mongoose.set('useFindAndModify', false);
+const fs = require('fs');
+const path = require('path');
 
 //Get function, returns all available streams
 //messages and version are omitted from the results
@@ -34,19 +36,60 @@ function getViewers(req, res) {
         })
 }
 
+// function sendTestVideo(req, res) {
+//     const path = '../../assets/sample.mp4'
+//     const stat = fs.statSync(path)
+//     const fileSize = stat.size
+//     const range = req.headers.range
+  
+//     if (range) {
+//       const parts = range.replace(/bytes=/, "").split("-")
+//       const start = parseInt(parts[0], 10)
+//       const end = parts[1]
+//         ? parseInt(parts[1], 10)
+//         : fileSize-1
+  
+//       const chunksize = (end-start)+1
+//       const file = fs.createReadStream(path, {start, end})
+//       const head = {
+//         'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+//         'Accept-Ranges': 'bytes',
+//         'Content-Length': chunksize,
+//         'Content-Type': 'video/mp4',
+//       }
+  
+//       res.writeHead(206, head)
+//       file.pipe(res)
+//     } else {
+//       const head = {
+//         'Content-Length': fileSize,
+//         'Content-Type': 'video/mp4',
+//       }
+//       res.writeHead(200, head)
+//       fs.createReadStream(path).pipe(res)
+//     }
+// }
+
 //Create function, body should have these properties:
 //  title: String,
 //  host: User  (ObjectId)
 function create(req, res) {
-    const newStream = new StreamMdl(req.body);
-    newStream.save(err => {
-        if (err) return res.status(500).send(err);
-        else {
-            ActivityController.addActivity(req.body.host, 'User created a new stream');
-            return res.status(200).send(newStream);
-        }
-
-    });
+    StreamMdl.find({ host: req.body.host, active: true })
+        .then(fnd => {
+            if (fnd.length > 0) {
+                console.log(fnd)
+                return res.status(400).send({ Error: 'User is already live!' })}
+            else {
+                const newStream = new StreamMdl(req.body);
+                newStream.save(err => {
+                    if (err) return res.status(500).send(err);
+                    else {
+                        ActivityController.addActivity(req.body.host, 'User created a new stream');
+                        return res.status(200).send(newStream);
+                    }
+                });
+            }
+        })
 }
 
 //Update function, URL parameters should have the streamId
@@ -64,15 +107,16 @@ function deactivateStream(req, res) {
         .populate('host')
         .then(updatedStrm => {
             var dif = updatedStrm.host.kudos + (Math.pow(2, (Math.floor((Math.abs(today - updatedStrm.createdAt)) / 1000 / 60 / 60))));
-            UserMdl.findByIdAndUpdate(updatedStrm.host, { kudos: dif }, { new: true })
-            .then(updatedUsr => {
-                console.log(updatedUsr.kudos);
-                ActivityController.addActivity(req.body.host, 'User ended the stream succesfully');
-                return res.status(200).send({ msg: 'Stream ended succesfully!' });
-            })
-            .catch(err => {
-                if (err) return res.status(401).send(err);
-            })
+            var strmtime = updatedStrm.host.totalStreamTime + (Math.floor((Math.abs(today - updatedStrm.createdAt)) / 1000 / 60 / 60));
+            //console.log('time', strmtime)
+            UserMdl.findByIdAndUpdate(updatedStrm.host, { kudos: dif, totalStreamTime: strmtime }, { new: true })
+                .then(updatedUsr => {
+                    console.log('updated kudos: ', updatedUsr.kudos);
+                    return res.status(200).send({ msg: 'Stream ended succesfully!' });
+                })
+                .catch(err => {
+                    if (err) return res.status(401).send(err);
+                })
         })
 }
 
