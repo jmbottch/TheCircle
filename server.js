@@ -12,6 +12,14 @@ var cert = require('./src/services/certificates');
 const NodeMediaServer = require('node-media-server');
 io.origins('*:*')
 app.options('*', cors());
+<<<<<<< HEAD
+=======
+const ActivityController = require('./src/controllers/activity_controller');
+const StreamController = require('./src/controllers/stream_controller');
+mongoose.set('useFindAndModify', false);
+const fs = require('fs')
+const path = require('path')
+>>>>>>> 7034bc09627532fe4643a2f16935d124f360928e
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -28,9 +36,12 @@ const User = require('./src/models/user');
 const Message = require('./src/models/message');
 const StreamMdl = require('./src/models/stream');
 
+<<<<<<< HEAD
 const ActivityController = require('./src/controllers/activity_controller');
 
 
+=======
+>>>>>>> 7034bc09627532fe4643a2f16935d124f360928e
 //enabled routes
 userroutes(app);
 messageroutes(app);
@@ -39,6 +50,39 @@ activityroutes(app);
 
 mongodb.createDevConnection();
 
+app.get('/api/video', function(req, res) {
+  const path = './assets/turk.mp4'
+  const stat = fs.statSync(path)
+  const fileSize = stat.size
+  const range = req.headers.range
+
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-")
+    const start = parseInt(parts[0], 10)
+    const end = parts[1]
+      ? parseInt(parts[1], 10)
+      : fileSize-1
+
+    const chunksize = (end-start)+1
+    const file = fs.createReadStream(path, {start, end})
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'video/mp4',
+    }
+
+    res.writeHead(206, head)
+    file.pipe(res)
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4',
+    }
+    res.writeHead(200, head)
+    fs.createReadStream(path).pipe(res)
+  }
+})
 
 app.post('/api/message/', function (req, res) {
   let signature = req.body.signature;
@@ -49,12 +93,14 @@ app.post('/api/message/', function (req, res) {
     .then(msg => {
       User.findById(req.body.host)
         .then(foundUser => {
+          msg.profilePicture = foundUser.profilePicture;
+          msg.save();
           foundUser.messages.push(msg)
           foundUser.save()
             .then(() => {
               emitNewMsg(req.body.host)
-              ActivityController.addActivity(req.body.author, 'Posted a message')
-                res.status(200).send({ Message: 'Message saved', Verified: verified });            
+              ActivityController.addActivity(req.body.author, 'Posted a message', 'PostMessage')
+              res.status(200).send({ Message: 'Message saved', Verified: verified });
             })
             .catch(err => {
               Message.remove(msg)
@@ -78,71 +124,129 @@ io.on('connection', socket => {
     this.emitNewMsg();
   });
 
-  // socket.on('startWatching', userIds => {
-  //   addToViewers(userIds.host, userIds.viewer)
-  // });
-
-  socket.on('startWatching', function (userIds, fn) {
-    //fn(addToViewers(userIds.host, userIds.viewer));
-    ActivityController.addActivity(userIds.viewer, 'Started watching stream with host: ' + userIds.host)
+  socket.on('startWatching', userIds => {
+    ActivityController.addActivity(userIds.viewer, 'Started watching stream with host: ' + userIds.host, 'StartWatching')
+    addToViewers(userIds.host, socket.id);
+    io.emit('viewSingle', 'new viewcount');
   });
 
-  // socket.on('stopWatching', userIds => {
-  //   removeFromViewers(userIds.host, userIds.viewer)
-  // });
+  socket.on('stopWatching', userIds => {
+    removeFromOne(userIds.host, socket.id)
+    io.emit('viewSingle', 'new viewcount');
+  });
 
   socket.on('getViewcount', host => {
     io.to(`${socketId}`).emit('viewcount', getViewcount(host));
   });
 
   socket.on('disconnect', () => {
-    io.emit('viewers', io.engine.clientsCount);
     console.log(`Socket ${socket.id} has disconnected`);
+    removeFromViewers(socket.id);
+    io.emit('viewers', io.engine.clientsCount);
+    io.emit('viewSingle', 'new viewcount');
   });
 
   io.emit('viewers', io.engine.clientsCount);
-  
+
   console.log(`Socket ${socket.id} has connected`);
 });
 
 function getViewcount(host) {
-  StreamMdl.findOne({host: host})
-  .then(strm => {
-    if (strm == null) {
-      console.log('Stream not found with host: ' + host)
-    } else {
-      console.log(strm.viewers.length());
-      return strm.viewers.length();
-    }
-  })
+  StreamMdl.findOne({ host: host })
+    .then(strm => {
+      if (strm == null) {
+        console.log('Stream not found with host: ' + host)
+      } else {
+        console.log(strm.viewers.length);
+        return strm.viewers.length;
+      }
+    })
 }
 
-function addToViewers(host, viewer) {
-  StreamMdl.findOne({host: host})
-  .then(strm => {
-    if (strm == null) {
-      console.log('Stream not found with host: ' + host)
-      return 'not added';
-    } else {
-      strm.viewers.push(viewer);
-      strm.save();
-      return 'added';
-    }
-  });
+function addToViewers(host, socketid) {
+  StreamMdl.findOne({ host: host })
+    .then(strm => {
+      if (strm == null) {
+        console.log('Stream not found with host: ' + host)
+        return 'not added';
+      } else {
+        strm.viewers.push(socketid);
+        strm.save()
+          .then(sved => {
+            console.log('saved: ', sved);
+            return 'added';
+          })
+      }
+    });
 };
 
-function removeFromViewers(host, viewer) {
-  StreamMdl.findOne({host: host})
-  .then(strm => {
-    if (strm == null) {
-      console.log('Stream not found with host: ' + host)
-    } else {
-      console.log(strm.viewers)
-      strm.viewers.splice(viewer, 1);
-      strm.save();
-      console.log(strm.viewers)
-    }
-  });
+function removeFromOne(host, socketid) {
+  StreamMdl.findOne({ host: host })
+    .then(strm => {
+      if (strm == null) {
+        console.log('Stream not found with host: ' + host)
+      } else {
+        var index = strm.viewers.indexOf(socketid);
+        if (index != -1) {
+          //console.log('strm pre', strm.viewers)
+          strm.viewers.splice(index, 1);
+          strm.save();
+          // console.log('strm post', strm.viewers)
+        }
+      }
+    });
+}
+
+function removeFromViewers(socketid) {
+  StreamMdl.find({})
+    .then(strms => {
+      if (strms == null) {
+        console.log('Error: No streams found')
+      } else {
+        for (let i of strms) {
+            var index = i.viewers.indexOf(socketid);
+            if (index != -1) {
+              //console.log('pre', i.viewers)
+              i.viewers.splice(index, 1);
+              i.save()
+                .then(saved => {
+                  console.log('saved: ', saved)
+                })
+            }
+        }
+      }
+    })
+    .catch(err => {
+      console.log('Error: An error occured while fetching all streams: ', err);
+    })
+
+  // if (host == 'all') {
+  //   StreamMdl.find({})
+  //     .then(strms => {
+  //       if (strms == null) {
+  //         console.log('no streams found')
+  //       } else {
+  //         for (let i of strms) {
+  //           var index = i.viewers.indexOf(socketid);
+  //           if (index != -1) {
+  //             //console.log('viewers PRE', i.viewers)
+  //             //console.log('index', index)
+  //             i.viewers.splice(index, 1);
+  //             //console.log('viewers post', i.viewers)
+  //             //i.save(); //<-- doesnt save
+  //             StreamMdl.findById(i._id)
+  //             .then(newStrm => {
+  //               //console.log('unsaved', newStrm);
+  //               newStrm.viewers = i.viewers;
+  //               newStrm.save();
+  //               //console.log('saved', newStrm);
+  //             })
+  //           }
+  //         }
+  //       }
+  //     });
+  // }
+
 };
 
 function emitNewMsg(userId) {

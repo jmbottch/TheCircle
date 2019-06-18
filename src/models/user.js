@@ -23,23 +23,30 @@ const UserSchema = new Schema({
         type: String,
         default: ''
     },
-    
     activities: [{
         type: String,
         default: []
     }],
-
     messages: [{
         type: Schema.Types.ObjectId,
         ref: 'message',
         default: []
     }],
-    kudos :
-        {
-            type: Number,
-            default: 420
-        },
-    privateKey : {
+    kudos:
+    {
+        type: Number,
+        default: 10
+    },
+    activities: [{
+        type: Schema.Types.ObjectId,
+        ref: 'activity'
+    }],
+    totalStreamTime: {
+        type: Number,
+        default: 0
+    },
+
+    privateKey: {
         type: String
     },
     publicKey: {
@@ -47,11 +54,7 @@ const UserSchema = new Schema({
     },
     certificate: {
         type: String
-    },
-    activities : [{
-        type: Schema.Types.ObjectId,
-        ref:'activity'
-    }]
+    }
 });
 
 const User = mongoose.model('user', UserSchema);

@@ -30,7 +30,8 @@ function login(req, res) {
                     kudos: user.kudos,
                     private: user.privateKey,
                     public: user.publicKey,
-                    cert: user.certificate
+                    cert: user.certificate,
+                    profilePicture: user.profilePicture
                  });
             }
         })

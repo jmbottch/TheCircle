@@ -8,6 +8,14 @@ module.exports = (app) => {
     //create a new stream
     app.post('/api/stream', StreamController.create);
 
+    //deactivate a stream
+    app.put('/api/stream/:id', StreamController.deactivateStream);
+
     //update a streams title with streamId in params and title in the body
     app.put('/api/stream', StreamController.update);
+
+    //get amount of viewers for a stream
+    app.get('/api/stream/:id/viewers', StreamController.getViewers);
+
+    app.put('/api/stream/:id/deactivate', StreamController.deactivateStream);
 };

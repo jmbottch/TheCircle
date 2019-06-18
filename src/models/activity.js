@@ -9,6 +9,11 @@ const ActivitySchema = new Schema({
     activity : {
         type: String
     },
+    category: {
+        type: String
+    }
+
+    //Possible categories: EndStream, CreateStream, PostMessage, StartWatching
    
 }, {
     timestamps: true
