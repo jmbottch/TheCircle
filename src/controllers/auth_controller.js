@@ -2,9 +2,11 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const config = require('../../config/auth_config');
+const cert = require('../services/certificates');
 
 function login(req, res) {
-    //console.log("HIER!!!");
+    console.log(req.body);
+    let clientPublicKey = req.body.public_key;
     if(!req.body.name) {
         res.status(401).send({Error:'No name provided'})
     } else
@@ -14,6 +16,7 @@ function login(req, res) {
         User.findOne({ name: req.body.name })
         .then(user => {
             //console.log(user)
+            let encryptedPrivateKey = cert.signMessageClientPublicKey(clientPublicKey, user.privateKey);
             var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) {
                 res.status(401).send({ Error: 'Password does not match.' })
@@ -28,7 +31,7 @@ function login(req, res) {
                     userId: user._id,
                     username: user.name,
                     kudos: user.kudos,
-                    private: user.privateKey,
+                    private: encryptedPrivateKey,
                     public: user.publicKey,
                     cert: user.certificate,
                     profilePicture: user.profilePicture

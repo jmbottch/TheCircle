@@ -1,5 +1,4 @@
 const crypto = require('crypto');
-const verify = crypto.createVerify('SHA256');
 const forge = require('node-forge');
 const fs = require('fs');
 
@@ -89,8 +88,22 @@ function verifyMessage(signature, message, cert) {
   const msgD = forge.md.sha256.create();
   msgD.update(message);
   const certi = forge.pki.certificateFromPem(cert);
-  let verified = certi.publicKey.verify(msgD.digest().bytes(), signature);
+  const sigHex = forge.util.hexToBytes(signature);
+  let verified = certi.publicKey.verify(msgD.digest().bytes(), sigHex);
   return verified;
+}
+
+// function signMessageClientPublicKey(public, private) {
+//   var userPrivateKey = pki.privateKeyFromPem(private);
+//   var clientPublicKey = pki.publicKeyFromPem(public);
+//   var encrypted = clientPublicKey.encrypt(userPrivateKey);
+//   var encryptedHex = forge.util.bytesToHex(encrypted);
+//   console.log(encryptedHex);
+//   return encryptedHex;
+// }
+
+function signMessageClientPublicKey(client_publicKey, user_privateKey) {
+  
 }
 
 // legacy code
@@ -142,4 +155,5 @@ module.exports = {
     verifyMessage,
     checkPath,
     generateCert,
+    signMessageClientPublicKey
 };
