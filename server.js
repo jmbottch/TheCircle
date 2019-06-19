@@ -86,7 +86,6 @@ io.on('connection', socket => {
   });
 
   socket.on('stopWatching', userIds => {
-    ActivityController.addActivity(userIds.viewer, 'Stopped watching stream with host: ' + userIds.host, 'Stopped watching')
     removeFromOne(userIds.host, socket.id)
     io.emit('viewSingle', 'new viewcount');
   });
