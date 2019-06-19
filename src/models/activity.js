@@ -13,7 +13,7 @@ const ActivitySchema = new Schema({
         type: String
     }
 
-    //Possible categories: 'Ended stream', 'Created stream', 'Posted message', 'Started watching'
+    //Possible categories: 'Ended stream', 'Created stream', 'Posted message', 'Started watching', ''
    
 }, {
     timestamps: true
