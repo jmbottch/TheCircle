@@ -8,15 +8,15 @@ const User = mongoose.model('user')
 
 describe('the user_controller', () => {
     //test user
-    user = new User({
+    var user = new User({
         name: 'Test User',
         password: 'Password',
         admin: true
     })
-    noname = new User({
+    var noname = new User({
         password: 'Password'
     })
-    nopass = new User({
+    var nopass = new User({
         name: 'Test User'
     })
 
