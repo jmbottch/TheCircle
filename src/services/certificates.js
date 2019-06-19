@@ -105,6 +105,33 @@ function encryptPrivateKey(client, user) {
   return response;
 }
 
+function checkStreamMessages(messages) {
+  const digestPromise = new Promise((resolve, reject) => {
+    if (!messages) reject('Error');
+    let streamMessagesDigest = [];
+    for (var i =0; i < messages.length; i++) {
+      console.log(messages[i]);
+      let msg = messages[i].message;
+      let msgD = forge.md.sha256.create();
+      msgD.update(msg);
+      let digest = msgD.digest().toHex();
+      let digestedMessage = {
+        _id: messages[i]._id,
+        authorname: messages[i].authorname,
+        author: messages[i].author,
+        message: msg,
+        hash: digest,
+        createdAt: messages[i].createdAt,
+        updatedAt: messages[i].updatedAt
+      }
+      streamMessagesDigest.push(digestedMessage);
+    }
+    console.log(streamMessagesDigest);
+    resolve(streamMessagesDigest);
+  });
+  return digestPromise;
+}
+
 // legacy code
     // let author = req.body.author;
     // let authorname = req.body.authorname;
@@ -154,5 +181,6 @@ module.exports = {
     verifyMessage,
     checkPath,
     generateCert,
-    encryptPrivateKey
+    encryptPrivateKey,
+    checkStreamMessages,
 };

@@ -19,7 +19,7 @@ const MessageSchema = new Schema({
     profilePicture: {
         type: String,
         default: ''
-    }
+    },
 }, {
     timestamps: true
 });

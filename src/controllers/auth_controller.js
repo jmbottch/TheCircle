@@ -15,16 +15,19 @@ function login(req, res) {
     } else {
         User.findOne({ name: req.body.name })
         .then(user => {
-            // console.log(user)
-            let encryptedPrivateKey = cert.encryptPrivateKey(clientPublicKey, user.privateKey);
-            var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+            console.log(user)
+            if (!user) {
+                res.status(400).json('User does not exists');
+            } else {
+                let encryptedPrivateKey = cert.encryptPrivateKey(clientPublicKey, user.privateKey);
+                var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) {
                 res.status(401).send({ Error: 'Password does not match.' })
             }
             else {
                 var token = jwt.sign({ id: user._id }, config.secret, {
                     expiresIn: 86400 // expires in 24 hours
-                });
+                });   
                 res.status(200).send({ 
                     auth: true, 
                     token: token, 
@@ -37,12 +40,14 @@ function login(req, res) {
                     profilePicture: user.profilePicture
                  });
             }
+            }
         })
         .catch(error => {
+            console.log(error);
             res.status(401).send({ Error: error });
         });
     }
-    }
+}
 
 function validateToken(req, res, next) {
     if (!req.headers.authorization) {

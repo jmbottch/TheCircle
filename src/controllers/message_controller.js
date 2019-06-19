@@ -1,5 +1,6 @@
 const Message = require('../models/message')
 const User = require('../models/user')
+const cert = require('../services/certificates');
 
 //depricated
 function getAll(req, res) {
@@ -16,8 +17,11 @@ function getStreamMessages(req, res) {
   User.findById(req.params.id, { __v: 0})
   .populate('messages')
   .then(foundUser => {
-    res.status(200).send(foundUser.messages)
-    
+    cert.checkStreamMessages(foundUser.messages)
+    .then(digested => {
+      res.status(200).send(digested);
+    })
+    .catch(err => console.log(err));  
   })
   .catch(err => {
     res.status(401).send(err)
@@ -32,8 +36,8 @@ function create(req, res) {
       foundUser.messages.push(msg)
       foundUser.save()
       .then(() => {
-        //emitNewMsg(req.body.host)
-        //socket.emit('getMsgs', req.body.host);
+        emitNewMsg(req.body.host)
+        socket.emit('getMsgs', req.body.host);
         res.status(200).send({Message : 'Message saved'})
       })
       .catch(err => {
