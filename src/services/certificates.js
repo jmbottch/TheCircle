@@ -8,12 +8,16 @@ var PATH = process.cwd() + '/certificates';
 // var pubkey = fs.readFileSync(process.cwd() + '/certificates/public.pem', 'utf8');
 
 // Done: integrity, authentication, x509 certificate
+// TODO: backend to frontend signature
 
 let rootCA = fs.readFileSync(PATH + '/circle.crt');
 let rootKey = fs.readFileSync(PATH + '/rootkey.pem');
+let forge_key = forge.pki.privateKeyFromPem(rootKey);
+
 
 function generateCert(name) {
   const promise = new Promise((resolve, reject) => {
+    if (!name) reject('Error');
     let keys = forge.pki.rsa.generateKeyPair(2048);
     let cert = forge.pki.createCertificate();
     cert.publicKey = keys.publicKey;
@@ -105,6 +109,14 @@ function encryptPrivateKey(client, user) {
   return response;
 }
 
+function signMessage(msg) {
+  const messageDigest = forge.md.sha256.create();
+  messageDigest.update(msg);
+  const signature = forge_key.sign(messageDigest);
+  const signatureHex = forge.util.bytesToHex(signature);
+  return signatureHex;
+}
+
 function checkStreamMessages(messages) {
   const digestPromise = new Promise((resolve, reject) => {
     if (!messages) reject('Error');
@@ -112,15 +124,13 @@ function checkStreamMessages(messages) {
     for (var i =0; i < messages.length; i++) {
       console.log(messages[i]);
       let msg = messages[i].message;
-      let msgD = forge.md.sha256.create();
-      msgD.update(msg);
-      let digest = msgD.digest().toHex();
+      let signatureHex = signMessage(msg);
       let digestedMessage = {
         _id: messages[i]._id,
         authorname: messages[i].authorname,
         author: messages[i].author,
         message: msg,
-        hash: digest,
+        signatureHex: signatureHex,
         createdAt: messages[i].createdAt,
         updatedAt: messages[i].updatedAt
       }
