@@ -1,21 +1,23 @@
-const crypto = require('crypto');
-const verify = crypto.createVerify('SHA256');
 const forge = require('node-forge');
 const fs = require('fs');
 
 var pki = forge.pki;
-// var passphrase = 'seeChange';
+var passphrase = 'seeChange';
 var PATH = process.cwd() + '/certificates';
 // var key = fs.readFileSync(process.cwd() + '/certificates/private.pem', 'utf8');
 // var pubkey = fs.readFileSync(process.cwd() + '/certificates/public.pem', 'utf8');
 
 // Done: integrity, authentication, x509 certificate
+// TODO: backend to frontend signature
 
 let rootCA = fs.readFileSync(PATH + '/circle.crt');
 let rootKey = fs.readFileSync(PATH + '/rootkey.pem');
+let forge_key = forge.pki.privateKeyFromPem(rootKey);
+
 
 function generateCert(name) {
   const promise = new Promise((resolve, reject) => {
+    if (!name) reject('Error');
     let keys = forge.pki.rsa.generateKeyPair(2048);
     let cert = forge.pki.createCertificate();
     cert.publicKey = keys.publicKey;
@@ -89,8 +91,55 @@ function verifyMessage(signature, message, cert) {
   const msgD = forge.md.sha256.create();
   msgD.update(message);
   const certi = forge.pki.certificateFromPem(cert);
-  let verified = certi.publicKey.verify(msgD.digest().bytes(), signature);
+  const sigHex = forge.util.hexToBytes(signature);
+  let verified = certi.publicKey.verify(msgD.digest().bytes(), sigHex);
   return verified;
+}
+
+function encryptPrivateKey(client, user) {
+  let encryptKey = pki.publicKeyFromPem(client);
+  let userPrivateKey = pki.privateKeyFromPem(user);
+  let encryptUserPrivateKey = pki.encryptRsaPrivateKey(userPrivateKey, passphrase);
+  let encrypted = encryptKey.encrypt(passphrase);
+  // console.log(encryptPrivateKey);
+  let response = {
+    e: encrypted,
+    eRsa: encryptUserPrivateKey
+  }
+  return response;
+}
+
+function signMessage(msg) {
+  const messageDigest = forge.md.sha256.create();
+  messageDigest.update(msg);
+  const signature = forge_key.sign(messageDigest);
+  const signatureHex = forge.util.bytesToHex(signature);
+  return signatureHex;
+}
+
+function checkStreamMessages(messages) {
+  const digestPromise = new Promise((resolve, reject) => {
+    if (!messages) reject('Error');
+    let streamMessagesDigest = [];
+    for (var i =0; i < messages.length; i++) {
+      console.log(messages[i]);
+      let msg = messages[i].message;
+      let signatureHex = signMessage(msg);
+      let digestedMessage = {
+        _id: messages[i]._id,
+        authorname: messages[i].authorname,
+        author: messages[i].author,
+        message: msg,
+        signatureHex: signatureHex,
+        createdAt: messages[i].createdAt,
+        updatedAt: messages[i].updatedAt
+      }
+      streamMessagesDigest.push(digestedMessage);
+    }
+    console.log(streamMessagesDigest);
+    resolve(streamMessagesDigest);
+  });
+  return digestPromise;
 }
 
 // legacy code
@@ -142,4 +191,6 @@ module.exports = {
     verifyMessage,
     checkPath,
     generateCert,
+    encryptPrivateKey,
+    checkStreamMessages,
 };
