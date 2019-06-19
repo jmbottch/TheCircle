@@ -40,22 +40,28 @@ function getViewers(req, res) {
 //  title: String,
 //  host: User  (ObjectId)
 function create(req, res) {
-    StreamMdl.find({ host: req.body.host, active: true })
-        .then(fnd => {
-            if (fnd.length > 0) {
-                console.log(fnd)
-                return res.status(400).send({ Error: 'User is already live!' })}
-            else {
-                const newStream = new StreamMdl(req.body);
-                newStream.save(err => {
-                    if (err) return res.status(500).send(err);
-                    else {
-                        ActivityController.addActivity(req.body.host, 'User created a new stream', 'CreateStream');
-                        return res.status(200).send(newStream);
-                    }
-                });
-            }
-        })
+    if(!req.body.title) {
+        res.status(401).send({Error: 'No title provided'})
+    } else if (!req.body.host) {
+        res.status(401).send({Error: 'No host provided'})
+    } else {
+        StreamMdl.find({ host: req.body.host, active: true })
+            .then(fnd => {
+                if (fnd.length > 0) {
+                    console.log(fnd)
+                    return res.status(400).send({ Error: 'User is already live!' })}
+                else {
+                    const newStream = new StreamMdl(req.body);
+                    newStream.save(err => {
+                        if (err) return res.status(500).send(err);
+                        else {
+                            ActivityController.addActivity(req.body.host, 'User created a new stream', 'CreateStream');
+                            return res.status(200).send(newStream);
+                        }
+                    });
+                }
+            })
+    }
 }
 
 //Update function, URL parameters should have the streamId

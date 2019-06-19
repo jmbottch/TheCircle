@@ -35,9 +35,7 @@ describe('the user_controller', () => {
         .send(noname)
         .end(function (err,res) {
             expect(res.statusCode).to.equal(401)
-            expect(res.body.err.name).to.equal('ValidationError')
-            expect(res.body.err.message).to.equal('user validation failed: name: Name is required.')
-           
+            expect(res.body.Error).to.equal('No name provided')
             done()
         })
     })

@@ -76,38 +76,48 @@ app.get('/api/video', function(req, res) {
 })
 
 app.post('/api/message/', function (req, res) {
-  let signature = req.body.signature;
-  let message = req.body.message;
-  let certificate = req.body.certificate;
-  let verified = cert.verifyMessage(signature, message, certificate);
-  Message.create(req.body)
-    .then(msg => {
-      User.findById(req.body.host)
-        .then(foundUser => {
-          msg.profilePicture = foundUser.profilePicture;
-          msg.save();
-          foundUser.messages.push(msg)
-          foundUser.save()
-            .then(() => {
-              emitNewMsg(req.body.host)
-              ActivityController.addActivity(req.body.author, 'Posted a message', 'PostMessage')
-              res.status(200).send({ Message: 'Message saved', Verified: verified });
-            })
-            .catch(err => {
-              Message.remove(msg)
-              console.log(err);
-              res.status(401).send({ Error: 'Error while pushing Message to Host' })
-            })
-        })
-        .catch(err => {
-          Message.remove(msg)
-          res.status(401).send({ Error: 'Host not found' })
-        })
-        .catch(err => {
-          console.log(err);
-          res.status(401).send({ Error: 'Error while creating Message' })
-        })
-    })
+  if(!req.body.message) {
+    res.status(401).send({Error: 'No content provided'})
+  } else
+  if(!req.body.signature || !req.body.certificate) {
+    res.status(401).send({Error: 'Error in key authentication'})
+  } else 
+  if(!req.body.author) {
+    res.status(401).send({Error: 'No author provided'})
+  } else {
+    let signature = req.body.signature;
+    let message = req.body.message;
+    let certificate = req.body.certificate;
+    let verified = cert.verifyMessage(signature, message, certificate);
+    Message.create(req.body)
+      .then(msg => {
+        User.findById(req.body.host)
+          .then(foundUser => {
+            msg.profilePicture = foundUser.profilePicture;
+            msg.save();
+            foundUser.messages.push(msg)
+            foundUser.save()
+              .then(() => {
+                emitNewMsg(req.body.host)
+                ActivityController.addActivity(req.body.author, 'Posted a message', 'PostMessage')
+                res.status(200).send({ Message: 'Message saved', Verified: verified });
+              })
+              .catch(err => {
+                Message.remove(msg)
+                console.log(err);
+                res.status(401).send({ Error: 'Error while pushing Message to Host' })
+              })
+          })
+          .catch(err => {
+            Message.remove(msg)
+            res.status(401).send({ Error: 'Host not found' })
+          })
+          .catch(err => {
+            console.log(err);
+            res.status(401).send({ Error: 'Error while creating Message' })
+          })
+      })
+  }
 })
 
 io.on('connection', socket => {
@@ -179,10 +189,8 @@ function removeFromOne(host, socketid) {
       } else {
         var index = strm.viewers.indexOf(socketid);
         if (index != -1) {
-          //console.log('strm pre', strm.viewers)
           strm.viewers.splice(index, 1);
           strm.save();
-          // console.log('strm post', strm.viewers)
         }
       }
     });
@@ -197,7 +205,6 @@ function removeFromViewers(socketid) {
         for (let i of strms) {
             var index = i.viewers.indexOf(socketid);
             if (index != -1) {
-              //console.log('pre', i.viewers)
               i.viewers.splice(index, 1);
               i.save()
                 .then(saved => {
@@ -210,34 +217,6 @@ function removeFromViewers(socketid) {
     .catch(err => {
       console.log('Error: An error occured while fetching all streams: ', err);
     })
-
-  // if (host == 'all') {
-  //   StreamMdl.find({})
-  //     .then(strms => {
-  //       if (strms == null) {
-  //         console.log('no streams found')
-  //       } else {
-  //         for (let i of strms) {
-  //           var index = i.viewers.indexOf(socketid);
-  //           if (index != -1) {
-  //             //console.log('viewers PRE', i.viewers)
-  //             //console.log('index', index)
-  //             i.viewers.splice(index, 1);
-  //             //console.log('viewers post', i.viewers)
-  //             //i.save(); //<-- doesnt save
-  //             StreamMdl.findById(i._id)
-  //             .then(newStrm => {
-  //               //console.log('unsaved', newStrm);
-  //               newStrm.viewers = i.viewers;
-  //               newStrm.save();
-  //               //console.log('saved', newStrm);
-  //             })
-  //           }
-  //         }
-  //       }
-  //     });
-  // }
-
 };
 
 function emitNewMsg(userId) {

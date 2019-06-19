@@ -89,7 +89,8 @@ function verifyMessage(signature, message, cert) {
   const msgD = forge.md.sha256.create();
   msgD.update(message);
   const certi = forge.pki.certificateFromPem(cert);
-  let verified = certi.publicKey.verify(msgD.digest().bytes(), signature);
+  const sig = forge.util.hexToBytes(signature);
+  let verified = certi.publicKey.verify(msgD.digest().bytes(), sig);
   return verified;
 }
 

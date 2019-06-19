@@ -46,7 +46,6 @@ function create(req, res) {
       res.status(401).send({Error:'Host not found'})
     })
     .catch(err => {
-      console.log(err);
       res.status(401).send({Error: 'Error while creating Message'})
     })
   })

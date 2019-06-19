@@ -28,6 +28,9 @@ function getSingle(req, res) {
 }
 
 function create(req, res) {
+    if(!req.body.name) {
+        res.status(401).send({Error : 'No name provided'})
+    } else
     if (!req.body.password) {
         res.status(401).send({ Error: 'No password provided' })
     } else {

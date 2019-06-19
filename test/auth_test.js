@@ -36,7 +36,6 @@ describe('the auth_controller can', () => {
             .post('/api/user/login')
             .send(login)
             .end(function (err,res) {
-                console.log(res.body)
                 var token = res.body.token
                 expect(res.statusCode).to.equal(200)
                 expect(res.body.auth).to.equal(true)
