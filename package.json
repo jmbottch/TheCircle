@@ -11,7 +11,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.0",
     "jsonwebtoken": "^8.5.1",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "mongoose": "^5.5.10",
     "node-forge": "^0.8.4",
     "node-media-server": "^2.1.0",
